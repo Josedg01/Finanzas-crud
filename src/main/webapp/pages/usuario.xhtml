@@ -4,77 +4,208 @@
                 xmlns:h="jakarta.faces.html"
                 xmlns:f="jakarta.faces.core"
                 xmlns:p="http://primefaces.org/ui">
+
     <ui:define name="content">
+
         <h2>Usuarios</h2>
+
         <h:form id="form">
-            
+
+            <p:messages showDetail="true" autoUpdate="true"/>
+
             <p:commandButton value="Nuevo" icon="pi pi-plus"
                              action="#{usuarioBean.prepararNuevo}"
                              update=":dlgNuevo"
                              oncomplete="PF('dlgNuevoWV').show()"/>
+
             <p:spacer width="10"/>
+
             <p:commandButton id="btnEliminar" value="Eliminar" icon="pi pi-trash"
                              actionListener="#{usuarioBean.eliminar}"
                              update="tabla :layoutForm:msgs"
                              disabled="#{empty usuarioBean.seleccionado}"/>
+
             <p:separator/>
-            <p:dataTable id="tabla" value="#{usuarioBean.lista}" var="u"
-                         selectionMode="single" selection="#{usuarioBean.seleccionado}" rowKey="#{u.id}" paginator="true" rows="10">
-                <p:ajax event="rowSelect" update=":form:btnEliminar" />
-                <p:ajax event="rowUnselect" update=":form:btnEliminar" />
-                <p:column headerText="ID" width="70"><h:outputText value="#{u.id}"/></p:column>
-                <p:column headerText="Nombre"><h:outputText value="#{u.nombre}"/></p:column>
-                <p:column headerText="Cédula" width="140"><h:outputText value="#{u.cedula}"/></p:column>
-                <p:column headerText="Tipo" width="110"><h:outputText value="#{u.tipoPersona}"/></p:column>
-                <p:column headerText="Límite Egresos" width="140"><h:outputText value="#{u.limiteEgresos}"/></p:column>
-                <p:column headerText="Corte (día)" width="110"><h:outputText value="#{u.fechaCorteDia}"/></p:column>
-                <p:column headerText="Estado" width="90"><h:outputText value="#{u.estado ? 'Activo' : 'Inactivo'}"/></p:column>
-                <p:column headerText="Editar" width="80"><p:commandButton icon="pi pi-pencil" update=":dlgEdit" oncomplete="PF('dlgEditWV').show()"/></p:column>
+
+            <p:dataTable id="tabla"
+                         value="#{usuarioBean.lista}"
+                         var="u"
+                         selectionMode="single"
+                         selection="#{usuarioBean.seleccionado}"
+                         rowKey="#{u.id}"
+                         paginator="true"
+                         rows="10">
+
+                <p:ajax event="rowSelect" update=":form:btnEliminar"/>
+                <p:ajax event="rowUnselect" update=":form:btnEliminar"/>
+
+                <p:column headerText="ID" width="70">
+                    <h:outputText value="#{u.id}"/>
+                </p:column>
+
+                <p:column headerText="Nombre">
+                    <h:outputText value="#{u.nombre}"/>
+                </p:column>
+
+                <p:column headerText="Cédula" width="140">
+                    <h:outputText value="#{u.cedula}"/>
+                </p:column>
+
+                <p:column headerText="Tipo" width="110">
+                    <h:outputText value="#{u.tipoPersona}"/>
+                </p:column>
+
+                <p:column headerText="Límite Egresos" width="140">
+                    <h:outputText value="#{u.limiteEgresos}"/>
+                </p:column>
+
+                <p:column headerText="Corte (día)" width="110">
+                    <h:outputText value="#{u.fechaCorteDia}"/>
+                </p:column>
+
+                <p:column headerText="Estado" width="90">
+                    <h:outputText value="#{u.estado ? 'Activo' : 'Inactivo'}"/>
+                </p:column>
+
+                <p:column headerText="Editar" width="80">
+                    <p:commandButton icon="pi pi-pencil"
+                                     update=":dlgEdit"
+                                     oncomplete="PF('dlgEditWV').show()"/>
+                </p:column>
+
             </p:dataTable>
+
         </h:form>
+
+        <!-- DIALOGO NUEVO -->
+
         <p:dialog id="dlgNuevo" widgetVar="dlgNuevoWV" header="Nuevo Usuario" modal="true" width="540">
+
             <h:form>
+
                 <p:panelGrid columns="2" styleClass="ui-fluid">
-                    <h:outputText value="Nombre"/><p:inputText value="#{usuarioBean.nuevo.nombre}" required="true"/>
-                    <h:outputText value="Cédula"/><p:inputText value="#{usuarioBean.nuevo.cedula}" required="true"/>
-                    <h:outputText value="Usuario/Login"/><p:inputText value="#{usuarioBean.nuevo.usuarioLogin}" required="true" requiredMessage="Digite el Usuario/Login"/>
-                    <h:outputText value="Contraseña"/><p:password value="#{usuarioBean.nuevoPass1}" feedback="true" required="true" requiredMessage="Digite una contraseña"/>
-                    <h:outputText value="Confirmar"/><p:password value="#{usuarioBean.nuevoPass2}" feedback="false" required="true" requiredMessage="Confirme la contraseña"/>
+
+                    <h:outputText value="Nombre"/>
+                    <p:inputText value="#{usuarioBean.nuevo.nombre}"
+                                 required="true"
+                                 requiredMessage="El nombre es obligatorio">
+                        <f:validateLength minimum="3" maximum="60"/>
+                    </p:inputText>
+
+                    <h:outputText value="Cédula"/>
+                    <p:inputMask value="#{usuarioBean.nuevo.cedula}"
+                                 mask="999-9999999-9"
+                                 required="true"
+                                 requiredMessage="La cédula es obligatoria">
+                        <f:validateRegex pattern="\d{3}-\d{7}-\d{1}"/>
+                    </p:inputMask>
+
                     <h:outputText value="Tipo Persona"/>
-                    <p:selectOneMenu value="#{usuarioBean.nuevo.tipoPersona}"><f:selectItems value="#{usuarioBean.tiposPersona}"/></p:selectOneMenu>
-                    <h:outputText value="Límite Egresos"/><p:inputNumber value="#{usuarioBean.nuevo.limiteEgresos}" decimalPlaces="2"/>
-                    <h:outputText value="Día Corte"/><p:inputNumber value="#{usuarioBean.nuevo.fechaCorteDia}" decimalPlaces="0" minValue="1" maxValue="31"/>
-                    <h:outputText value="Estado"/><p:selectBooleanCheckbox value="#{usuarioBean.nuevo.estado}"/>
+                    <p:selectOneMenu value="#{usuarioBean.nuevo.tipoPersona}"
+                                     required="true"
+                                     requiredMessage="Debe seleccionar un tipo de persona">
+                        <f:selectItem itemLabel="Seleccione" itemValue="" noSelectionOption="true"/>
+                        <f:selectItems value="#{usuarioBean.tiposPersona}"/>
+                    </p:selectOneMenu>
+
+                    <h:outputText value="Límite Egresos"/>
+                    <p:inputNumber value="#{usuarioBean.nuevo.limiteEgresos}"
+                                   decimalPlaces="2"
+                                   minValue="0"
+                                   required="true"
+                                   requiredMessage="Debe indicar el límite de egresos"/>
+
+                    <h:outputText value="Día Corte"/>
+                    <p:inputNumber value="#{usuarioBean.nuevo.fechaCorteDia}"
+                                   decimalPlaces="0"
+                                   minValue="1"
+                                   maxValue="31"
+                                   required="true"
+                                   requiredMessage="El día de corte es obligatorio"/>
+
+                    <h:outputText value="Estado"/>
+                    <p:selectBooleanCheckbox value="#{usuarioBean.nuevo.estado}"/>
+
                 </p:panelGrid>
+
                 <p:separator/>
-                <p:commandButton value="Guardar" icon="pi pi-check"
+
+                <p:commandButton value="Guardar"
+                                 icon="pi pi-check"
                                  actionListener="#{usuarioBean.guardarNuevo}"
                                  process="@form"
                                  update="@form :form:tabla :layoutForm:msgs"
                                  oncomplete="if(!args.validationFailed) PF('dlgNuevoWV').hide();"/>
+
             </h:form>
+
         </p:dialog>
+
+        <!-- DIALOGO EDITAR -->
+
         <p:dialog id="dlgEdit" widgetVar="dlgEditWV" header="Editar Usuario" modal="true" width="540">
+
             <h:form>
+
                 <p:panelGrid columns="2" styleClass="ui-fluid">
-                    <h:outputText value="ID"/><h:outputText value="#{usuarioBean.seleccionado.id}"/>
-                    <h:outputText value="Nombre"/><p:inputText value="#{usuarioBean.seleccionado.nombre}" required="true"/>
-                    <h:outputText value="Cédula"/><p:inputText value="#{usuarioBean.seleccionado.cedula}" required="true"/>
-                    <h:outputText value="Usuario/Login"/><p:inputText value="#{usuarioBean.seleccionado.usuarioLogin}" required="true"/>
-                    <h:outputText value="Nueva contraseña"/><p:password value="#{usuarioBean.editPass}" feedback="true"/>
+
+                    <h:outputText value="ID"/>
+                    <h:outputText value="#{usuarioBean.seleccionado.id}"/>
+
+                    <h:outputText value="Nombre"/>
+                    <p:inputText value="#{usuarioBean.seleccionado.nombre}"
+                                 required="true"
+                                 requiredMessage="El nombre es obligatorio">
+                        <f:validateLength minimum="3" maximum="60"/>
+                    </p:inputText>
+
+                    <h:outputText value="Cédula"/>
+                    <p:inputMask value="#{usuarioBean.seleccionado.cedula}"
+                                 mask="999-9999999-9"
+                                 required="true"
+                                 requiredMessage="La cédula es obligatoria">
+                        <f:validateRegex pattern="\d{3}-\d{7}-\d{1}"/>
+                    </p:inputMask>
+
                     <h:outputText value="Tipo Persona"/>
-                    <p:selectOneMenu value="#{usuarioBean.seleccionado.tipoPersona}"><f:selectItems value="#{usuarioBean.tiposPersona}"/></p:selectOneMenu>
-                    <h:outputText value="Límite Egresos"/><p:inputNumber value="#{usuarioBean.seleccionado.limiteEgresos}" decimalPlaces="2"/>
-                    <h:outputText value="Día Corte"/><p:inputNumber value="#{usuarioBean.seleccionado.fechaCorteDia}" decimalPlaces="0" minValue="1" maxValue="31"/>
-                    <h:outputText value="Estado"/><p:selectBooleanCheckbox value="#{usuarioBean.seleccionado.estado}"/>
+                    <p:selectOneMenu value="#{usuarioBean.seleccionado.tipoPersona}"
+                                     required="true"
+                                     requiredMessage="Debe seleccionar un tipo de persona">
+                        <f:selectItem itemLabel="Seleccione" itemValue="" noSelectionOption="true"/>
+                        <f:selectItems value="#{usuarioBean.tiposPersona}"/>
+                    </p:selectOneMenu>
+
+                    <h:outputText value="Límite Egresos"/>
+                    <p:inputNumber value="#{usuarioBean.seleccionado.limiteEgresos}"
+                                   decimalPlaces="2"
+                                   minValue="0"
+                                   required="true"/>
+
+                    <h:outputText value="Día Corte"/>
+                    <p:inputNumber value="#{usuarioBean.seleccionado.fechaCorteDia}"
+                                   decimalPlaces="0"
+                                   minValue="1"
+                                   maxValue="31"
+                                   required="true"/>
+
+                    <h:outputText value="Estado"/>
+                    <p:selectBooleanCheckbox value="#{usuarioBean.seleccionado.estado}"/>
+
                 </p:panelGrid>
+
                 <p:separator/>
-                <p:commandButton value="Guardar cambios" icon="pi pi-save"
+
+                <p:commandButton value="Guardar cambios"
+                                 icon="pi pi-save"
                                  actionListener="#{usuarioBean.guardarEdicion}"
                                  process="@form"
                                  update="@form :form:tabla :layoutForm:msgs"
                                  oncomplete="if(!args.validationFailed) PF('dlgEditWV').hide();"/>
+
             </h:form>
+
         </p:dialog>
+
     </ui:define>
+
 </ui:composition>
