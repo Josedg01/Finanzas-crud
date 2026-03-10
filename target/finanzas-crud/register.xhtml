@@ -26,7 +26,10 @@
                 <p:inputText id="nombre" value="#{authBean.nuevo.nombre}" required="true" requiredMessage="Digite el nombre."/>
 
                 <p:outputLabel for="ced" value="Cédula"/>
-                <p:inputText id="ced" value="#{authBean.nuevo.cedula}" required="true" requiredMessage="Digite la cédula."/>
+                <p:inputText id="ced" value="#{authBean.nuevo.cedula}" required="true" requiredMessage="Digite la cédula." validator="cedulaValidator"/>
+                
+                <p:outputLabel value=""/>
+                <p:message for="ced" display="text"/>
 
                 <p:outputLabel for="tipo" value="Tipo Persona"/>
                 <p:selectOneMenu id="tipo" value="#{authBean.nuevo.tipoPersona}" required="true">

@@ -2,6 +2,7 @@ package com.finanzas.web.bean;
 
 import com.finanzas.entity.Usuario;
 import com.finanzas.service.UsuarioService;
+import com.finanzas.web.util.CedulaUtil;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
@@ -49,6 +50,13 @@ public class UsuarioBean extends CrudBeanBase<Usuario> {
         if (t.getUsuarioLogin() == null || t.getUsuarioLogin().isBlank()) {
             throw new IllegalArgumentException("Digite el Usuario/Login");
         }
+         if (t.getCedula() == null || t.getCedula().isBlank()) {
+            throw new IllegalArgumentException("Digite la cédula");
+        }
+        if (!CedulaUtil.validarCedula(t.getCedula())) {
+            throw new IllegalArgumentException("La cédula ingresada no es válida");
+        }
+        
         if (nuevoPass1 == null || nuevoPass1.isBlank()) {
             throw new IllegalArgumentException("Digite una contraseña");
         }
@@ -63,6 +71,14 @@ public class UsuarioBean extends CrudBeanBase<Usuario> {
 
     @Override
     protected Usuario actualizar(Usuario t) {
+        if (t.getCedula() == null || t.getCedula().isBlank()) {
+            throw new IllegalArgumentException("Digite la cédula");
+        }
+        if (!CedulaUtil.validarCedula(t.getCedula())) {
+            throw new IllegalArgumentException("La cédula ingresada no es válida");
+        }
+        
+        
         // Si se digitó una nueva contraseña, actualizar hash
         if (editPass != null && !editPass.isBlank()) {
             t.setPasswordHash(org.mindrot.jbcrypt.BCrypt.hashpw(editPass, org.mindrot.jbcrypt.BCrypt.gensalt(12)));

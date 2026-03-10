@@ -13,6 +13,7 @@ com\finanzas\service\TipoEgresoService.class
 com\finanzas\repo\TipoPagoRepo.class
 com\finanzas\service\GenericService.class
 com\finanzas\service\TipoPagoService.class
+com\finanzas\web\util\CedulaUtil.class
 com\finanzas\entity\Ingreso.class
 com\finanzas\service\UsuarioService.class
 com\finanzas\entity\TipoEgreso.class
@@ -29,6 +30,7 @@ com\finanzas\entity\Corte.class
 com\finanzas\service\EgresoService.class
 com\finanzas\entity\RenglonEgreso.class
 com\finanzas\web\bean\IngresoBean.class
+com\finanzas\web\validator\CedulaJSFValidator.class
 com\finanzas\entity\Egreso.class
 com\finanzas\entity\TipoIngreso.class
 com\finanzas\repo\UsuarioRepo.class
