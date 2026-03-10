@@ -4,33 +4,75 @@
                 xmlns:h="jakarta.faces.html"
                 xmlns:f="jakarta.faces.core"
                 xmlns:p="http://primefaces.org/ui">
+
     <ui:define name="content">
+
         <h2>Usuarios</h2>
+
         <h:form id="form">
 
             <p:commandButton value="Nuevo" icon="pi pi-plus"
                              action="#{usuarioBean.prepararNuevo}"
                              update=":dlgNuevo"
                              oncomplete="PF('dlgNuevoWV').show()"/>
+
             <p:spacer width="10"/>
+
             <p:commandButton id="btnEliminar" value="Eliminar" icon="pi pi-trash"
                              actionListener="#{usuarioBean.eliminar}"
                              update="tabla :layoutForm:msgs"
                              disabled="#{empty usuarioBean.seleccionado}"/>
+
             <p:separator/>
-            <p:dataTable id="tabla" value="#{usuarioBean.lista}" var="u"
-                         selectionMode="single" selection="#{usuarioBean.seleccionado}" rowKey="#{u.id}" paginator="true" rows="10">
-                <p:ajax event="rowSelect" update=":form:btnEliminar" />
-                <p:ajax event="rowUnselect" update=":form:btnEliminar" />
-                <p:column headerText="ID" width="70"><h:outputText value="#{u.id}"/></p:column>
-                <p:column headerText="Nombre"><h:outputText value="#{u.nombre}"/></p:column>
-                <p:column headerText="Cédula" width="140"><h:outputText value="#{u.cedula}"/></p:column>
-                <p:column headerText="Tipo" width="110"><h:outputText value="#{u.tipoPersona}"/></p:column>
-                <p:column headerText="Límite Egresos" width="140"><h:outputText value="#{u.limiteEgresos}"/></p:column>
-                <p:column headerText="Corte (día)" width="110"><h:outputText value="#{u.fechaCorteDia}"/></p:column>
-                <p:column headerText="Estado" width="90"><h:outputText value="#{u.estado ? 'Activo' : 'Inactivo'}"/></p:column>
-                <p:column headerText="Editar" width="80"><p:commandButton icon="pi pi-pencil" update=":dlgEdit" oncomplete="PF('dlgEditWV').show()"/></p:column>
+
+            <p:dataTable id="tabla"
+                         value="#{usuarioBean.lista}"
+                         var="u"
+                         selectionMode="single"
+                         selection="#{usuarioBean.seleccionado}"
+                         rowKey="#{u.id}"
+                         paginator="true"
+                         rows="10">
+
+                <p:ajax event="rowSelect" update=":form:btnEliminar"/>
+                <p:ajax event="rowUnselect" update=":form:btnEliminar"/>
+
+                <p:column headerText="ID" width="70">
+                    <h:outputText value="#{u.id}"/>
+                </p:column>
+
+                <p:column headerText="Nombre">
+                    <h:outputText value="#{u.nombre}"/>
+                </p:column>
+
+                <p:column headerText="Cédula" width="140">
+                    <h:outputText value="#{u.cedula}"/>
+                </p:column>
+
+                <p:column headerText="Tipo" width="110">
+                    <h:outputText value="#{u.tipoPersona}"/>
+                </p:column>
+
+                <p:column headerText="Límite Egresos" width="140">
+                    <h:outputText value="#{u.limiteEgresos}"/>
+                </p:column>
+
+                <p:column headerText="Corte (día)" width="110">
+                    <h:outputText value="#{u.fechaCorteDia}"/>
+                </p:column>
+
+                <p:column headerText="Estado" width="90">
+                    <h:outputText value="#{u.estado ? 'Activo' : 'Inactivo'}"/>
+                </p:column>
+
+                <p:column headerText="Editar" width="80">
+                    <p:commandButton icon="pi pi-pencil"
+                                     update=":dlgEdit"
+                                     oncomplete="PF('dlgEditWV').show()"/>
+                </p:column>
+
             </p:dataTable>
+
         </h:form>
 
         <p:dialog id="dlgNuevo" widgetVar="dlgNuevoWV" header="Nuevo Usuario" modal="true" width="540">
@@ -72,13 +114,18 @@
                         <h:outputText value="Estado"/>
                         <p:selectBooleanCheckbox value="#{usuarioBean.nuevo.estado}"/>
                 </p:panelGrid>
+
                 <p:separator/>
-                <p:commandButton value="Guardar" icon="pi pi-check"
+
+                <p:commandButton value="Guardar"
+                                 icon="pi pi-check"
                                  actionListener="#{usuarioBean.guardarNuevo}"
                                  process="@form"
                                  update="@form :form:tabla :layoutForm:msgs"
                                  oncomplete="if(!args.validationFailed) PF('dlgNuevoWV').hide();"/>
+
             </h:form>
+
         </p:dialog>
 
         <p:dialog id="dlgEdit" widgetVar="dlgEditWV" header="Editar Usuario" modal="true" width="540">
@@ -120,13 +167,19 @@
                         <h:outputText value="Estado"/>
                         <p:selectBooleanCheckbox value="#{usuarioBean.seleccionado.estado}"/>
                 </p:panelGrid>
+
                 <p:separator/>
-                <p:commandButton value="Guardar cambios" icon="pi pi-save"
+
+                <p:commandButton value="Guardar cambios"
+                                 icon="pi pi-save"
                                  actionListener="#{usuarioBean.guardarEdicion}"
                                  process="@form"
                                  update="@form :form:tabla :layoutForm:msgs"
                                  oncomplete="if(!args.validationFailed) PF('dlgEditWV').hide();"/>
+
             </h:form>
+
         </p:dialog>
+
     </ui:define>
 </ui:composition>
