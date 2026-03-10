@@ -1,0 +1,259 @@
+
+
+
+<ui:composition template="/templates/main.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui">
+    <ui:define name="content">
+
+        <h2>Transacciones</h2>
+
+        <h:form id="form">
+            <p:commandButton value="Nuevo" icon="pi pi-plus"
+                             actionListener="#{transaccionBean.prepararNuevo}"
+                             update=":dlgNuevo"
+                             oncomplete="PF('dlgNuevoWV').show()"/>
+
+            <p:spacer width="10"/>
+
+            <p:commandButton id="btnEliminar" value="Eliminar" icon="pi pi-trash"
+                             actionListener="#{transaccionBean.eliminar}"
+                             update="tabla :layoutForm:msgs"
+                             disabled="#{empty transaccionBean.seleccionado}"/>
+
+            <p:separator/>
+
+            <p:dataTable id="tabla" value="#{transaccionBean.lista}" var="t"
+                         selectionMode="single"
+                         selection="#{transaccionBean.seleccionado}"
+                         rowKey="#{t.id}"
+                         paginator="true" rows="10">
+
+                <p:ajax event="rowSelect" update=":form:btnEliminar"/>
+                <p:ajax event="rowUnselect" update=":form:btnEliminar"/>
+
+                <p:column headerText="ID" width="70">
+                    <h:outputText value="#{t.id}"/>
+                </p:column>
+
+                <p:column headerText="Tipo" width="90">
+                    <h:outputText value="#{t.tipoTransaccion}"/>
+                </p:column>
+
+                <p:column headerText="Usuario">
+                    <h:outputText value="#{t.usuario.nombre}"/>
+                </p:column>
+
+                <p:column headerText="Concepto">
+                    <h:outputText value="#{t.egreso != null ? t.egreso.descripcion : (t.ingreso != null ? t.ingreso.descripcion : '-') }"/>
+                </p:column>
+
+                <p:column headerText="Monto" width="120">
+                    <h:outputText value="#{t.monto}"/>
+                </p:column>
+
+                <p:column headerText="Fecha" width="160">
+                    <h:outputText value="#{t.fechaTransaccion}">
+                        <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Editar" width="90">
+                    <p:commandButton icon="pi pi-pencil"
+                                     actionListener="#{transaccionBean.prepararEdit}"
+                                     update=":dlgEdit"
+                                     oncomplete="PF('dlgEditWV').show()"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+
+        <p:dialog id="dlgNuevo" widgetVar="dlgNuevoWV" header="Nueva Transacción"
+                  modal="true" width="640">
+
+            <h:form id="formNuevo">
+
+                <p:messages id="msgNuevo" showDetail="true" closable="true"/>
+
+                <p:scrollPanel style="width:100%; height:60vh;">
+                    <p:panelGrid id="dlgNuevoPanel" columns="2" styleClass="ui-fluid">
+
+                        <h:outputText value="Tipo"/>
+                        <p:selectOneMenu id="tipoNuevo"
+                                         value="#{transaccionBean.nuevo.tipoTransaccion}"
+                                         required="true" requiredMessage="Seleccione el tipo">
+                            <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{transaccionBean.tiposTransaccion}"/>
+                            <p:ajax listener="#{transaccionBean.onTipoTransaccionChange}" update="dlgNuevoPanel"/>
+                        </p:selectOneMenu>
+
+                        <h:outputText value="Usuario"/>
+                        <p:selectOneMenu id="usuarioNuevo"
+                                         value="#{transaccionBean.nuevoUsuarioId}"
+                                         required="true" requiredMessage="Seleccione un usuario..."
+                                         filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{transaccionBean.usuarios}" var="u"
+                                           itemLabel="#{u.nombre}" itemValue="#{u.id}"/>
+                        </p:selectOneMenu>
+
+                        <h:outputText value="Tipo Pago"/>
+                        <p:selectOneMenu id="tipoPagoNuevo"
+                                         value="#{transaccionBean.nuevoTipoPagoId}"
+                                         filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="(N/A)" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{transaccionBean.tiposPago}" var="p"
+                                           itemLabel="#{p.descripcion}" itemValue="#{p.id}"/>
+                        </p:selectOneMenu>
+
+                        <h:outputText value="Egreso"/>
+                        <p:selectOneMenu id="egresoNuevo"
+                                         value="#{transaccionBean.nuevoEgresoId}"
+                                         disabled="#{transaccionBean.nuevo.tipoTransaccion ne 'EGRESO'}"
+                                         filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="(N/A)" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{transaccionBean.egresos}" var="e"
+                                           itemLabel="#{e.descripcion}" itemValue="#{e.id}"/>
+                        </p:selectOneMenu>
+
+                        <h:outputText value="Ingreso"/>
+                        <p:selectOneMenu id="ingresoNuevo"
+                                         value="#{transaccionBean.nuevoIngresoId}"
+                                         disabled="#{transaccionBean.nuevo.tipoTransaccion ne 'INGRESO'}"
+                                         filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="(N/A)" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{transaccionBean.ingresos}" var="i"
+                                           itemLabel="#{i.descripcion}" itemValue="#{i.id}"/>
+                        </p:selectOneMenu>
+
+                        <h:outputText value="Monto"/>
+                        <p:inputNumber id="montoNuevo"
+                                       value="#{transaccionBean.nuevo.monto}"
+                                       decimalPlaces="2"
+                                       required="true" requiredMessage="Monto requerido"/>
+
+                        <h:outputText value="Fecha Transacción"/>
+                        <p:datePicker id="fechaNuevo"
+                                      value="#{transaccionBean.nuevo.fechaTransaccion}"
+                                      showTime="true"
+                                      required="true" requiredMessage="Seleccione la fecha"/>
+
+                        <h:outputText value="TarjetaCR"/>
+                        <p:inputText value="#{transaccionBean.nuevo.tarjetaCR}"/>
+
+                        <h:outputText value="Comentario"/>
+                        <p:inputTextarea value="#{transaccionBean.nuevo.comentario}" autoResize="true"/>
+
+                        <h:outputText value="Estado"/>
+                        <p:selectBooleanCheckbox value="#{transaccionBean.nuevo.estado}"/>
+
+                    </p:panelGrid>
+                </p:scrollPanel>
+
+                <p:separator/>
+
+                <p:commandButton value="Guardar" icon="pi pi-check"
+                                 actionListener="#{transaccionBean.guardarNuevo}"
+                                 process="@form"
+                                 update="@form :form:tabla :layoutForm:msgs"
+                                 oncomplete="if(!args.validationFailed) PF('dlgNuevoWV').hide();"/>
+            </h:form>
+        </p:dialog>
+
+
+        <p:dialog id="dlgEdit" widgetVar="dlgEditWV" header="Editar Transacción"
+                  modal="true" width="640">
+
+            <h:form id="formEdit">
+
+                <p:messages id="msgEdit" showDetail="true" closable="true"/>
+
+                <p:scrollPanel style="width:100%; height:60vh;">
+                    <p:panelGrid id="dlgEditPanel" columns="2" styleClass="ui-fluid">
+
+                        <h:outputText value="ID"/>
+                        <h:outputText value="#{transaccionBean.seleccionado.id}"/>
+
+                        <h:outputText value="Tipo"/>
+                        <p:selectOneMenu id="tipoEdit"
+                                         value="#{transaccionBean.seleccionado.tipoTransaccion}"
+                                         required="true" requiredMessage="Seleccione el tipo">
+                            <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{transaccionBean.tiposTransaccion}"/>
+                            <p:ajax listener="#{transaccionBean.onTipoTransaccionChange}" update="dlgEditPanel"/>
+                        </p:selectOneMenu>
+
+                        <h:outputText value="Usuario"/>
+                        <p:selectOneMenu id="usuarioEdit"
+                                         value="#{transaccionBean.editUsuarioId}"
+                                         required="true" requiredMessage="Seleccione un usuario..."
+                                         filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{transaccionBean.usuarios}" var="u"
+                                           itemLabel="#{u.nombre}" itemValue="#{u.id}"/>
+                        </p:selectOneMenu>
+
+                        <h:outputText value="Tipo Pago"/>
+                        <p:selectOneMenu id="tipoPagoEdit"
+                                         value="#{transaccionBean.editTipoPagoId}"
+                                         filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="(N/A)" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{transaccionBean.tiposPago}" var="p"
+                                           itemLabel="#{p.descripcion}" itemValue="#{p.id}"/>
+                        </p:selectOneMenu>
+
+                        <h:outputText value="Egreso"/>
+                        <p:selectOneMenu id="egresoEdit"
+                                         value="#{transaccionBean.editEgresoId}"
+                                         disabled="#{transaccionBean.seleccionado.tipoTransaccion ne 'EGRESO'}"
+                                         filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="(N/A)" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{transaccionBean.egresos}" var="e"
+                                           itemLabel="#{e.descripcion}" itemValue="#{e.id}"/>
+                        </p:selectOneMenu>
+
+                        <h:outputText value="Ingreso"/>
+                        <p:selectOneMenu id="ingresoEdit"
+                                         value="#{transaccionBean.editIngresoId}"
+                                         disabled="#{transaccionBean.seleccionado.tipoTransaccion ne 'INGRESO'}"
+                                         filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="(N/A)" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{transaccionBean.ingresos}" var="i"
+                                           itemLabel="#{i.descripcion}" itemValue="#{i.id}"/>
+                        </p:selectOneMenu>
+
+                        <h:outputText value="Monto"/>
+                        <p:inputNumber value="#{transaccionBean.seleccionado.monto}" decimalPlaces="2"
+                                       required="true" requiredMessage="Monto requerido"/>
+
+                        <h:outputText value="Fecha Transacción"/>
+                        <p:datePicker value="#{transaccionBean.seleccionado.fechaTransaccion}" showTime="true"
+                                      required="true" requiredMessage="Seleccione la fecha"/>
+
+                        <h:outputText value="TarjetaCR"/>
+                        <p:inputText value="#{transaccionBean.seleccionado.tarjetaCR}"/>
+
+                        <h:outputText value="Comentario"/>
+                        <p:inputTextarea value="#{transaccionBean.seleccionado.comentario}" autoResize="true"/>
+
+                        <h:outputText value="Estado"/>
+                        <p:selectBooleanCheckbox value="#{transaccionBean.seleccionado.estado}"/>
+
+                    </p:panelGrid>
+                </p:scrollPanel>
+
+                <p:separator/>
+
+                <p:commandButton value="Guardar cambios" icon="pi pi-save"
+                                 actionListener="#{transaccionBean.guardarEdicion}"
+                                 process="@form"
+                                 update="@form :form:tabla :layoutForm:msgs"
+                                 oncomplete="if(!args.validationFailed) PF('dlgEditWV').hide();"/>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+</ui:composition>

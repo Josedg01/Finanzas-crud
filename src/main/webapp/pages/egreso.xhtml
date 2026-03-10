@@ -1,0 +1,199 @@
+<ui:composition template="/templates/main.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+
+        <h2>Egresos</h2>
+
+        <h:form id="form">
+
+            <p:commandButton value="Nuevo" icon="pi pi-plus"
+                             actionListener="#{egresoBean.prepararNuevo}"
+                             update=":dlgNuevo"
+                             oncomplete="PF('dlgNuevoWV').show()"/>
+
+            <p:spacer width="10"/>
+
+            <p:commandButton id="btnEliminar" value="Eliminar" icon="pi pi-trash"
+                             actionListener="#{egresoBean.eliminar}"
+                             update="tabla :layoutForm:msgs"
+                             disabled="#{empty egresoBean.seleccionado}"/>
+
+            <p:separator/>
+
+            <p:dataTable id="tabla" value="#{egresoBean.lista}" var="e"
+                         selectionMode="single"
+                         selection="#{egresoBean.seleccionado}"
+                         rowKey="#{e.id}"
+                         paginator="true" rows="10">
+
+                <p:ajax event="rowSelect" update=":form:btnEliminar"/>
+                <p:ajax event="rowUnselect" update=":form:btnEliminar"/>
+
+                <p:column headerText="ID" width="70">
+                    <h:outputText value="#{e.id}"/>
+                </p:column>
+
+                <p:column headerText="Tipo">
+                    <h:outputText value="#{e.tipoEgreso.descripcion}"/>
+                </p:column>
+
+                <p:column headerText="Renglón">
+                    <h:outputText value="#{e.renglonEgreso.descripcion}"/>
+                </p:column>
+
+                <p:column headerText="Pago Def.">
+                    <h:outputText value="#{e.tipoPagoDefecto != null ? e.tipoPagoDefecto.descripcion : '-' }"/>
+                </p:column>
+
+                <p:column headerText="Descripción">
+                    <h:outputText value="#{e.descripcion}"/>
+                </p:column>
+
+                <p:column headerText="Estado" width="100">
+                    <h:outputText value="#{e.estado ? 'Activo' : 'Inactivo'}"/>
+                </p:column>
+
+                <p:column headerText="Editar" width="90">
+                    <p:commandButton icon="pi pi-pencil"
+                                     actionListener="#{egresoBean.prepararEdit}"
+                                     update=":dlgEdit"
+                                     oncomplete="PF('dlgEditWV').show()"/>
+                </p:column>
+
+            </p:dataTable>
+
+        </h:form>
+
+
+        <p:dialog id="dlgNuevo" widgetVar="dlgNuevoWV" header="Nuevo Egreso"
+                  modal="true" width="540">
+
+            <h:form id="formNuevo">
+
+                <p:messages id="msgNuevo" showDetail="true" closable="true"/>
+
+                <p:panelGrid columns="2" styleClass="ui-fluid">
+
+                    <h:outputText value="Tipo Egreso"/>
+                    <p:selectOneMenu id="tipoNuevo"
+                                     value="#{egresoBean.nuevoTipoEgresoId}"
+                                     required="true"
+                                     requiredMessage="Seleccione un Tipo de Egreso"
+                                     filter="true" filterMatchMode="contains">
+                        <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{egresoBean.tiposEgreso}" var="t"
+                                       itemLabel="#{t.descripcion}" itemValue="#{t.id}"/>
+                    </p:selectOneMenu>
+
+                    <h:outputText value="Renglón Egreso"/>
+                    <p:selectOneMenu id="renglonNuevo"
+                                     value="#{egresoBean.nuevoRenglonEgresoId}"
+                                     required="true"
+                                     requiredMessage="Seleccione un Renglón de Egreso"
+                                     filter="true" filterMatchMode="contains">
+                        <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{egresoBean.renglonesEgreso}" var="r"
+                                       itemLabel="#{r.descripcion}" itemValue="#{r.id}"/>
+                    </p:selectOneMenu>
+
+                    <h:outputText value="Tipo Pago Defecto"/>
+                    <p:selectOneMenu id="pagoDefNuevo"
+                                     value="#{egresoBean.nuevoTipoPagoDefectoId}"
+                                     filter="true" filterMatchMode="contains">
+                        <f:selectItem itemLabel="(Sin defecto)" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{egresoBean.tiposPago}" var="p"
+                                       itemLabel="#{p.descripcion}" itemValue="#{p.id}"/>
+                    </p:selectOneMenu>
+
+                    <h:outputText value="Descripción"/>
+                    <p:inputText value="#{egresoBean.nuevo.descripcion}"
+                                 required="true"
+                                 requiredMessage="Digite una descripción."/>
+
+                    <h:outputText value="Estado"/>
+                    <p:selectBooleanCheckbox value="#{egresoBean.nuevo.estado}"/>
+
+                </p:panelGrid>
+
+                <p:separator/>
+
+                <p:commandButton value="Guardar" icon="pi pi-check"
+                                 actionListener="#{egresoBean.guardarNuevo}"
+                                 process="@form"
+                                 update="@form :form:tabla :layoutForm:msgs"
+                                 oncomplete="if(!args.validationFailed) PF('dlgNuevoWV').hide();" />
+
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="dlgEdit" widgetVar="dlgEditWV" header="Editar Egreso"
+                  modal="true" width="540">
+
+            <h:form id="formEdit">
+
+                <p:messages id="msgEdit" showDetail="true" closable="true"/>
+
+                <p:panelGrid columns="2" styleClass="ui-fluid">
+
+                    <h:outputText value="ID"/>
+                    <h:outputText value="#{egresoBean.seleccionado.id}"/>
+
+                    <h:outputText value="Tipo Egreso"/>
+                    <p:selectOneMenu id="tipoEdit"
+                                     value="#{egresoBean.editTipoEgresoId}"
+                                     required="true"
+                                     requiredMessage="Seleccione un Tipo de Egreso"
+                                     filter="true" filterMatchMode="contains">
+                        <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{egresoBean.tiposEgreso}" var="t"
+                                       itemLabel="#{t.descripcion}" itemValue="#{t.id}"/>
+                    </p:selectOneMenu>
+
+                    <h:outputText value="Renglón Egreso"/>
+                    <p:selectOneMenu id="renglonEdit"
+                                     value="#{egresoBean.editRenglonEgresoId}"
+                                     required="true"
+                                     requiredMessage="Seleccione un Renglón de Egreso"
+                                     filter="true" filterMatchMode="contains">
+                        <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{egresoBean.renglonesEgreso}" var="r"
+                                       itemLabel="#{r.descripcion}" itemValue="#{r.id}"/>
+                    </p:selectOneMenu>
+
+                    <h:outputText value="Tipo Pago Defecto"/>
+                    <p:selectOneMenu id="pagoDefEdit"
+                                     value="#{egresoBean.editTipoPagoDefectoId}"
+                                     filter="true" filterMatchMode="contains">
+                        <f:selectItem itemLabel="(Sin defecto)" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{egresoBean.tiposPago}" var="p"
+                                       itemLabel="#{p.descripcion}" itemValue="#{p.id}"/>
+                    </p:selectOneMenu>
+
+                    <h:outputText value="Descripción"/>
+                    <p:inputText value="#{egresoBean.seleccionado.descripcion}"
+                                 required="true"
+                                 requiredMessage="Digite una descripción."/>
+
+                    <h:outputText value="Estado"/>
+                    <p:selectBooleanCheckbox value="#{egresoBean.seleccionado.estado}"/>
+
+                </p:panelGrid>
+
+                <p:separator/>
+
+                <p:commandButton value="Guardar cambios" icon="pi pi-save"
+                                 actionListener="#{egresoBean.guardarEdicion}"
+                                 process="@form"
+                                 update="@form :form:tabla :layoutForm:msgs"
+                                 oncomplete="if(!args.validationFailed) PF('dlgEditWV').hide();"/>
+
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+</ui:composition>

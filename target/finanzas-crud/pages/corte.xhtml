@@ -1,0 +1,182 @@
+<ui:composition template="/templates/main.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui">
+    <ui:define name="content">
+        <h2>Cortes</h2>
+
+        <h:form id="form">
+            <p:commandButton value="Nuevo" icon="pi pi-plus"
+                             actionListener="#{corteBean.prepararNuevo}"
+                             update=":dlgNuevo"
+                             oncomplete="PF('dlgNuevoWV').show()"/>
+
+            <p:spacer width="10"/>
+
+            <p:commandButton id="btnEliminar" value="Eliminar" icon="pi pi-trash"
+                             actionListener="#{corteBean.eliminar}"
+                             update="tabla :layoutForm:msgs"
+                             disabled="#{empty corteBean.seleccionado}"/>
+
+            <p:separator/>
+
+            <p:dataTable id="tabla" value="#{corteBean.lista}" var="c"
+                         selectionMode="single"
+                         selection="#{corteBean.seleccionado}"
+                         rowKey="#{c.id}"
+                         paginator="true" rows="10">
+
+                <p:ajax event="rowSelect" update=":form:btnEliminar"/>
+                <p:ajax event="rowUnselect" update=":form:btnEliminar"/>
+
+                <p:column headerText="ID" width="70">
+                    <h:outputText value="#{c.id}"/>
+                </p:column>
+
+                <p:column headerText="Usuario">
+                    <h:outputText value="#{c.usuario.nombre}"/>
+                </p:column>
+
+                <p:column headerText="Periodo" width="120">
+                    <h:outputText value="#{c.anio}-#{c.mes}"/>
+                </p:column>
+
+                <p:column headerText="Fecha Corte" width="140">
+                    <h:outputText value="#{c.fechaCorte}">
+                        <f:convertDateTime pattern="yyyy-MM-dd"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Balance Corte" width="140">
+                    <h:outputText value="#{c.balanceCorte}"/>
+                </p:column>
+
+                <p:column headerText="Estado" width="100">
+                    <h:outputText value="#{c.estado ? 'Activo' : 'Inactivo'}"/>
+                </p:column>
+
+                <p:column headerText="Editar" width="90">
+                    <p:commandButton icon="pi pi-pencil"
+                                     actionListener="#{corteBean.prepararEdit}"
+                                     update=":dlgEdit"
+                                     oncomplete="PF('dlgEditWV').show()"/>
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog id="dlgNuevo" widgetVar="dlgNuevoWV" header="Nuevo Corte" modal="true" width="650">
+            <h:form id="formNuevo">
+
+                <p:messages id="msgNuevo" showDetail="true" closable="true"/>
+
+                <p:panelGrid columns="2" styleClass="ui-fluid">
+
+                    <h:outputText value="Usuario"/>
+                    <p:selectOneMenu value="#{corteBean.nuevoUsuarioId}"
+                                     required="true"
+                                     requiredMessage="Seleccione un usuario."
+                                     filter="true" filterMatchMode="contains">
+                        <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{corteBean.usuarios}" var="u"
+                                       itemLabel="#{u.nombre}" itemValue="#{u.id}"/>
+                    </p:selectOneMenu>
+
+                    <h:outputText value="Año"/>
+                    <p:inputText value="#{corteBean.nuevo.anio}" required="true" requiredMessage="Digite el año."/>
+
+                    <h:outputText value="Mes"/>
+                    <p:inputText value="#{corteBean.nuevo.mes}" required="true" requiredMessage="Digite el mes."/>
+
+                    <h:outputText value="Fecha Corte"/>
+                    <p:datePicker value="#{corteBean.nuevo.fechaCorte}" pattern="yyyy-MM-dd"
+                                  required="true" requiredMessage="Seleccione la fecha."/>
+
+                    <h:outputText value="Balance Inicial"/>
+                    <p:inputNumber value="#{corteBean.nuevo.balanceInicial}" decimalPlaces="2"/>
+
+                    <h:outputText value="Total Ingresos"/>
+                    <p:inputNumber value="#{corteBean.nuevo.totalIngresos}" decimalPlaces="2"/>
+
+                    <h:outputText value="Total Egresos"/>
+                    <p:inputNumber value="#{corteBean.nuevo.totalEgresos}" decimalPlaces="2"/>
+
+                    <h:outputText value="Balance Corte"/>
+                    <p:inputNumber value="#{corteBean.nuevo.balanceCorte}" decimalPlaces="2"/>
+
+                    <h:outputText value="Estado"/>
+                    <p:selectBooleanCheckbox value="#{corteBean.nuevo.estado}"/>
+
+                </p:panelGrid>
+
+                <p:separator/>
+
+                <p:commandButton value="Guardar" icon="pi pi-check"
+                                 actionListener="#{corteBean.guardarNuevo}"
+                                 process="@form"
+                                 update="@form :form:tabla :layoutForm:msgs"
+                                 oncomplete="if(!args.validationFailed) PF('dlgNuevoWV').hide();"/>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="dlgEdit" widgetVar="dlgEditWV" header="Editar Corte" modal="true" width="650">
+            <h:form id="formEdit">
+
+                <p:messages id="msgEdit" showDetail="true" closable="true"/>
+
+                <p:panelGrid columns="2" styleClass="ui-fluid">
+
+                    <h:outputText value="ID"/>
+                    <h:outputText value="#{corteBean.seleccionado.id}"/>
+
+                    <h:outputText value="Usuario"/>
+                    <p:selectOneMenu value="#{corteBean.editUsuarioId}"
+                                     required="true"
+                                     requiredMessage="Seleccione un usuario."
+                                     filter="true" filterMatchMode="contains">
+                        <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{corteBean.usuarios}" var="u"
+                                       itemLabel="#{u.nombre}" itemValue="#{u.id}"/>
+                    </p:selectOneMenu>
+
+                    <h:outputText value="Año"/>
+                    <p:inputText value="#{corteBean.seleccionado.anio}" required="true" requiredMessage="Digite el año."/>
+
+                    <h:outputText value="Mes"/>
+                    <p:inputText value="#{corteBean.seleccionado.mes}" required="true" requiredMessage="Digite el mes."/>
+
+                    <h:outputText value="Fecha Corte"/>
+                    <p:datePicker value="#{corteBean.seleccionado.fechaCorte}" pattern="yyyy-MM-dd"
+                                  required="true" requiredMessage="Seleccione la fecha."/>
+
+                    <h:outputText value="Balance Inicial"/>
+                    <p:inputNumber value="#{corteBean.seleccionado.balanceInicial}" decimalPlaces="2"/>
+
+                    <h:outputText value="Total Ingresos"/>
+                    <p:inputNumber value="#{corteBean.seleccionado.totalIngresos}" decimalPlaces="2"/>
+
+                    <h:outputText value="Total Egresos"/>
+                    <p:inputNumber value="#{corteBean.seleccionado.totalEgresos}" decimalPlaces="2"/>
+
+                    <h:outputText value="Balance Corte"/>
+                    <p:inputNumber value="#{corteBean.seleccionado.balanceCorte}" decimalPlaces="2"/>
+
+                    <h:outputText value="Estado"/>
+                    <p:selectBooleanCheckbox value="#{corteBean.seleccionado.estado}"/>
+
+                </p:panelGrid>
+
+                <p:separator/>
+
+                <p:commandButton value="Guardar cambios" icon="pi pi-save"
+                                 actionListener="#{corteBean.guardarEdicion}"
+                                 process="@form"
+                                 update="@form :form:tabla :layoutForm:msgs"
+                                 oncomplete="if(!args.validationFailed) PF('dlgEditWV').hide();"/>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+</ui:composition>

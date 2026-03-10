@@ -1,0 +1,148 @@
+<ui:composition template="/templates/main.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+
+        <h2>Ingresos</h2>
+
+        <h:form id="form">
+            <p:commandButton value="Nuevo" icon="pi pi-plus"
+                             actionListener="#{ingresoBean.prepararNuevo}"
+                             update=":dlgNuevo"
+                             oncomplete="PF('dlgNuevoWV').show()"/>
+
+            <p:spacer width="10"/>
+
+            <p:commandButton id="btnEliminar" value="Eliminar" icon="pi pi-trash"
+                             actionListener="#{ingresoBean.eliminar}"
+                             update="tabla :layoutForm:msgs"
+                             disabled="#{empty ingresoBean.seleccionado}"/>
+
+            <p:separator/>
+
+            <p:dataTable id="tabla" value="#{ingresoBean.lista}" var="i"
+                         selectionMode="single"
+                         selection="#{ingresoBean.seleccionado}"
+                         rowKey="#{i.id}"
+                         paginator="true" rows="10">
+
+                <p:ajax event="rowSelect" update=":form:btnEliminar"/>
+                <p:ajax event="rowUnselect" update=":form:btnEliminar"/>
+
+                <p:column headerText="ID" width="80">
+                    <h:outputText value="#{i.id}"/>
+                </p:column>
+
+                <p:column headerText="Tipo Ingreso">
+                    <h:outputText value="#{i.tipoIngreso.descripcion}"/>
+                </p:column>
+
+                <p:column headerText="Descripción">
+                    <h:outputText value="#{i.descripcion}"/>
+                </p:column>
+
+                <p:column headerText="Institución">
+                    <h:outputText value="#{i.institucion}"/>
+                </p:column>
+
+                <p:column headerText="Estado" width="120">
+                    <h:outputText value="#{i.estado ? 'Activo' : 'Inactivo'}"/>
+                </p:column>
+
+                <p:column headerText="Editar" width="120">
+                    <p:commandButton icon="pi pi-pencil"
+                                     actionListener="#{ingresoBean.prepararEdit}"
+                                     update=":dlgEdit"
+                                     oncomplete="PF('dlgEditWV').show()"/>
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+
+
+        <p:dialog id="dlgNuevo" widgetVar="dlgNuevoWV" header="Nuevo Ingreso" modal="true" width="520">
+            <h:form id="formNuevo">
+
+                <p:messages id="msgNuevo" showDetail="true" closable="true"/>
+
+                <p:panelGrid columns="2" styleClass="ui-fluid">
+                    <h:outputText value="Tipo Ingreso"/>
+                    <p:selectOneMenu value="#{ingresoBean.nuevoTipoIngresoId}"
+                                     required="true"
+                                     requiredMessage="Seleccione un Tipo de Ingreso"
+                                     filter="true" filterMatchMode="contains">
+                        <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{ingresoBean.tiposIngreso}" var="t"
+                                       itemLabel="#{t.descripcion}" itemValue="#{t.id}"/>
+                    </p:selectOneMenu>
+
+                    <h:outputText value="Descripción"/>
+                    <p:inputText value="#{ingresoBean.nuevo.descripcion}"
+                                 required="true"
+                                 requiredMessage="Digite una descripción."/>
+
+                    <h:outputText value="Institución"/>
+                    <p:inputText value="#{ingresoBean.nuevo.institucion}"/>
+
+                    <h:outputText value="Estado"/>
+                    <p:selectBooleanCheckbox value="#{ingresoBean.nuevo.estado}"/>
+                </p:panelGrid>
+
+                <p:separator/>
+
+                <p:commandButton value="Guardar" icon="pi pi-check"
+                                 actionListener="#{ingresoBean.guardarNuevo}"
+                                 process="@form"
+                                 update="@form :form:tabla :layoutForm:msgs"
+                                 oncomplete="if(!args.validationFailed) PF('dlgNuevoWV').hide();"/>
+            </h:form>
+        </p:dialog>
+
+
+        <p:dialog id="dlgEdit" widgetVar="dlgEditWV" header="Editar Ingreso" modal="true" width="520">
+            <h:form id="formEdit">
+
+                <p:messages id="msgEdit" showDetail="true" closable="true"/>
+
+                <p:panelGrid columns="2" styleClass="ui-fluid">
+                    <h:outputText value="ID"/>
+                    <h:outputText value="#{ingresoBean.seleccionado.id}"/>
+
+                    <h:outputText value="Tipo Ingreso"/>
+                    <p:selectOneMenu value="#{ingresoBean.editTipoIngresoId}"
+                                     required="true"
+                                     requiredMessage="Seleccione un Tipo de Ingreso"
+                                     filter="true" filterMatchMode="contains">
+                        <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{ingresoBean.tiposIngreso}" var="t"
+                                       itemLabel="#{t.descripcion}" itemValue="#{t.id}"/>
+                    </p:selectOneMenu>
+
+                    <h:outputText value="Descripción"/>
+                    <p:inputText value="#{ingresoBean.seleccionado.descripcion}"
+                                 required="true"
+                                 requiredMessage="Digite una descripción."/>
+
+                    <h:outputText value="Institución"/>
+                    <p:inputText value="#{ingresoBean.seleccionado.institucion}"/>
+
+                    <h:outputText value="Estado"/>
+                    <p:selectBooleanCheckbox value="#{ingresoBean.seleccionado.estado}"/>
+                </p:panelGrid>
+
+                <p:separator/>
+
+                <p:commandButton value="Guardar cambios" icon="pi pi-save"
+                                 actionListener="#{ingresoBean.guardarEdicion}"
+                                 process="@form"
+                                 update="@form :form:tabla :layoutForm:msgs"
+                                 oncomplete="if(!args.validationFailed) PF('dlgEditWV').hide();"/>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+</ui:composition>

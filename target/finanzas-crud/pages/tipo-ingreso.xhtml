@@ -1,0 +1,98 @@
+<ui:composition template="/templates/main.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:h="jakarta.faces.html"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+
+        <h2>Tipos de Ingreso</h2>
+
+        <h:form id="form">
+            <p:commandButton value="Nuevo" icon="pi pi-plus"
+                             actionListener="#{tipoIngresoBean.prepararNuevo}"
+                             update=":dlgNuevo"
+                             oncomplete="PF('dlgNuevoWV').show()"/>
+
+            <p:spacer width="10"/>
+
+            <p:commandButton id="btnEliminar" value="Eliminar" icon="pi pi-trash"
+                             actionListener="#{tipoIngresoBean.eliminar}"
+                             update="tabla :layoutForm:msgs"
+                             disabled="#{empty tipoIngresoBean.seleccionado}"/>
+
+            <p:separator/>
+
+            <p:dataTable id="tabla" value="#{tipoIngresoBean.lista}" var="t"
+                         selectionMode="single"
+                         selection="#{tipoIngresoBean.seleccionado}"
+                         rowKey="#{t.id}"
+                         paginator="true" rows="10">
+
+
+                <p:ajax event="rowSelect" update=":form:btnEliminar"/>
+                <p:ajax event="rowUnselect" update=":form:btnEliminar"/>
+                <p:column headerText="ID" width="80">
+                    <h:outputText value="#{t.id}"/>
+                </p:column>
+
+                <p:column headerText="Descripción">
+                    <h:outputText value="#{t.descripcion}"/>
+                </p:column>
+
+                <p:column headerText="Estado" width="120">
+                    <h:outputText value="#{t.estado ? 'Activo' : 'Inactivo'}"/>
+                </p:column>
+
+                <p:column headerText="Editar" width="120">
+                    <p:commandButton icon="pi pi-pencil"
+                                     update=":dlgEdit"
+                                     oncomplete="PF('dlgEditWV').show()"/>
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog id="dlgNuevo" widgetVar="dlgNuevoWV" header="Nuevo Tipo de Ingreso" modal="true" width="480">
+            <h:form>
+                <p:panelGrid columns="2" styleClass="ui-fluid">
+                    <h:outputText value="Descripción"/>
+                    <p:inputText value="#{tipoIngresoBean.nuevo.descripcion}" required="true"/>
+
+                    <h:outputText value="Estado"/>
+                    <p:selectBooleanCheckbox value="#{tipoIngresoBean.nuevo.estado}"/>
+                </p:panelGrid>
+
+                <p:separator/>
+
+                <p:commandButton value="Guardar" icon="pi pi-check"
+                                 actionListener="#{tipoIngresoBean.guardarNuevo}"
+                                 update=":form:tabla :layoutForm:msgs"
+                                 oncomplete="PF('dlgNuevoWV').hide()"/>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="dlgEdit" widgetVar="dlgEditWV" header="Editar Tipo de Ingreso" modal="true" width="480">
+            <h:form>
+                <p:panelGrid columns="2" styleClass="ui-fluid">
+                    <h:outputText value="ID"/>
+                    <h:outputText value="#{tipoIngresoBean.seleccionado.id}"/>
+
+                    <h:outputText value="Descripción"/>
+                    <p:inputText value="#{tipoIngresoBean.seleccionado.descripcion}" required="true"/>
+
+                    <h:outputText value="Estado"/>
+                    <p:selectBooleanCheckbox value="#{tipoIngresoBean.seleccionado.estado}"/>
+                </p:panelGrid>
+
+                <p:separator/>
+
+                <p:commandButton value="Guardar cambios" icon="pi pi-save"
+                                 actionListener="#{tipoIngresoBean.guardarEdicion}"
+                                 update=":form:tabla :layoutForm:msgs"
+                                 oncomplete="PF('dlgEditWV').hide()"/>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+</ui:composition>

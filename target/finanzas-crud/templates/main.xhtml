@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <title>Finanzas CRUD</title>
+    </h:head>
+
+    <h:body>
+<h:form id="layoutForm">
+        <p:menubar rendered="#{authBean.loggedIn}">
+            <ui:include src="/menu.xhtml"/>
+
+            <f:facet name="options">
+
+                <p:menuButton value="#{authBean.usuarioActual.nombre}" icon="pi pi-user">
+                    <p:menuitem value="Cerrar sesión"
+                                icon="pi pi-sign-out"
+                                actionListener="#{authBean.doLogout}"
+                                ajax="false"/>
+                </p:menuButton>
+
+            </f:facet>
+        </p:menubar>
+        
+            <p:growl id="msgs" showDetail="true" life="4000" />
+        </h:form>
+
+        <!-- Contenido de cada página -->
+        <div style="padding:16px">
+            <ui:insert name="content"/>
+        </div>
+
+    </h:body>
+</html>

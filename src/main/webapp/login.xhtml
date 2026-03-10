@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Login - Finanzas CRUD</title>
+</h:head>
+
+<h:body style="margin:0;">
+
+<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;">
+    <p:card style="width:420px; max-width:100%;">
+        <f:facet name="title">Iniciar sesión</f:facet>
+
+        <h:form id="loginForm">
+            <p:messages id="msgs" showDetail="true" closable="true"/>
+
+            <p:panelGrid columns="1" styleClass="ui-fluid">
+                <p:outputLabel for="login" value="Usuario"/>
+                <p:inputText id="login" value="#{authBean.login}" required="true" requiredMessage="Digite el usuario."/>
+
+                <p:outputLabel for="pass" value="Contraseña"/>
+                <p:password id="pass" value="#{authBean.password}" feedback="false" required="true" requiredMessage="Digite la contraseña."/>
+            </p:panelGrid>
+
+            <p:separator/>
+
+            <p:commandButton value="Entrar" icon="pi pi-sign-in"
+                             actionListener="#{authBean.doLogin}"
+                             process="@form" update="@form"/>
+
+            <div style="margin-top:12px; text-align:center;">
+                <h:link outcome="/register.xhtml" value="Crear cuenta"/>
+            </div>
+        </h:form>
+    </p:card>
+</div>
+
+</h:body>
+</html>
