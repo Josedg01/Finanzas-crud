@@ -10,11 +10,11 @@
         <h2>Usuarios</h2>
 
         <h:form id="form">
-
             <p:commandButton value="Nuevo" icon="pi pi-plus"
                              action="#{usuarioBean.prepararNuevo}"
                              update=":dlgNuevo"
-                             oncomplete="PF('dlgNuevoWV').show()"/>
+                             oncomplete="PF('dlgNuevoWV').show()"
+                             rendered="false" />
 
             <p:spacer width="10"/>
 
@@ -25,100 +25,92 @@
 
             <p:separator/>
 
-            <p:dataTable id="tabla"
-                         value="#{usuarioBean.lista}"
-                         var="u"
+            <p:dataTable id="tabla" value="#{usuarioBean.lista}" var="u"
                          selectionMode="single"
                          selection="#{usuarioBean.seleccionado}"
                          rowKey="#{u.id}"
-                         paginator="true"
-                         rows="10">
+                         paginator="true" rows="10">
+                <p:ajax event="rowSelect" update=":form:btnEliminar" />
+                <p:ajax event="rowUnselect" update=":form:btnEliminar" />
 
-                <p:ajax event="rowSelect" update=":form:btnEliminar"/>
-                <p:ajax event="rowUnselect" update=":form:btnEliminar"/>
+                <p:column headerText="ID" width="70"><h:outputText value="#{u.id}"/></p:column>
+                <p:column headerText="Nombre"><h:outputText value="#{u.nombre}"/></p:column>
+                <p:column headerText="Cédula" width="140"><h:outputText value="#{u.cedula}"/></p:column>
+                <p:column headerText="RNC" width="120"><h:outputText value="#{u.rnc}"/></p:column>
 
-                <p:column headerText="ID" width="70">
-                    <h:outputText value="#{u.id}"/>
-                </p:column>
+                <p:column headerText="Tipo" width="110"><h:outputText value="#{u.tipoPersona}"/></p:column>
+                <p:column headerText="Límite Egresos" width="140"><h:outputText value="#{u.limiteEgresos}"/></p:column>
+                <p:column headerText="Corte (día)" width="110"><h:outputText value="#{u.fechaCorteDia}"/></p:column>
+                <p:column headerText="Estado" width="90"><h:outputText value="#{u.estado ? 'Activo' : 'Inactivo'}"/></p:column>
 
-                <p:column headerText="Nombre">
-                    <h:outputText value="#{u.nombre}"/>
-                </p:column>
-
-                <p:column headerText="Cédula" width="140">
-                    <h:outputText value="#{u.cedula}"/>
-                </p:column>
-
-                <p:column headerText="Tipo" width="110">
-                    <h:outputText value="#{u.tipoPersona}"/>
-                </p:column>
-
-                <p:column headerText="Límite Egresos" width="140">
-                    <h:outputText value="#{u.limiteEgresos}"/>
-                </p:column>
-
-                <p:column headerText="Corte (día)" width="110">
-                    <h:outputText value="#{u.fechaCorteDia}"/>
-                </p:column>
-
-                <p:column headerText="Estado" width="90">
-                    <h:outputText value="#{u.estado ? 'Activo' : 'Inactivo'}"/>
-                </p:column>
-
-                <p:column headerText="Editar" width="80">
-                    <p:commandButton icon="pi pi-pencil"
-                                     update=":dlgEdit"
+                <p:column headerText="Editar" width="90">
+                    <p:commandButton icon="pi pi-pencil" update=":dlgEdit"
                                      oncomplete="PF('dlgEditWV').show()"/>
                 </p:column>
-
             </p:dataTable>
 
         </h:form>
 
-        <p:dialog id="dlgNuevo" widgetVar="dlgNuevoWV" header="Nuevo Usuario" modal="true" width="540">
-            <h:form id="nuevoForm"> 
-                <p:panelGrid columns="2" styleClass="ui-fluid">
+        <!-- ===================== NUEVO ===================== -->
+        <p:dialog id="dlgNuevo" widgetVar="dlgNuevoWV" header="Nuevo Usuario" modal="true" width="640" height="640">
+            <h:form id="nuevoForm">
+
+                <p:messages id="msgNuevo" showDetail="true" closable="true"/>
+
+                <p:panelGrid id="panelNuevo" layout="grid" columns="2"
+                             styleClass="ui-fluid"
+                             columnClasses="col-12 md:col-4, col-12 md:col-8">
+
                     <h:outputText value="Nombre"/>
-                    <p:inputText value="#{usuarioBean.nuevo.nombre}" required="true"/>
+                    <p:inputText value="#{usuarioBean.nuevo.nombre}" required="true"
+                                 requiredMessage="Digite el nombre."/>
+
+                    <h:outputText value="Tipo Persona"/>
+                    <p:selectOneMenu value="#{usuarioBean.nuevo.tipoPersona}">
+                        <f:selectItems value="#{usuarioBean.tiposPersona}"/>
+                        <!-- refresca para aplicar required/disabled -->
+                        <p:ajax update="panelNuevo"/>
+                    </p:selectOneMenu>
 
                     <h:outputText value="Cédula"/>
-                    <p:inputText id="cedulaNuevo"  
-                                 value="#{usuarioBean.nuevo.cedula}"
-                                 required="true"
-                                 requiredMessage="Digite la cédula."
-                                 validator="cedulaValidator"/> 
+                    <p:inputText value="#{usuarioBean.nuevo.cedula}"
+                                 required="#{usuarioBean.nuevo.tipoPersona eq 'FISICA'}"
+                                 disabled="#{usuarioBean.nuevo.tipoPersona ne 'FISICA'}"
+                                 requiredMessage="Digite la cédula (persona física)."/>
 
-                                 <h:outputText value=""/>
-                        <p:message for="cedulaNuevo" display="text"/> 
+                    <h:outputText value="RNC"/>
+                    <p:inputText value="#{usuarioBean.nuevo.rnc}"
+                                 required="#{usuarioBean.nuevo.tipoPersona eq 'JURIDICA'}"
+                                 disabled="#{usuarioBean.nuevo.tipoPersona ne 'JURIDICA'}"
+                                 requiredMessage="Digite el RNC (persona jurídica)."/>
 
-                        <h:outputText value="Usuario/Login"/>
-                        <p:inputText value="#{usuarioBean.nuevo.usuarioLogin}" required="true" requiredMessage="Digite el Usuario/Login"/>
+                    <h:outputText value="Usuario/Login"/>
+                    <p:inputText value="#{usuarioBean.nuevo.usuarioLogin}" required="true"
+                                 requiredMessage="Digite el Usuario/Login"/>
 
-                        <h:outputText value="Contraseña"/>
-                        <p:password value="#{usuarioBean.nuevoPass1}" feedback="true" required="true" requiredMessage="Digite una contraseña"/>
+                    <h:outputText value="Contraseña"/>
+                    <p:password value="#{usuarioBean.nuevoPass1}" feedback="true" required="true"
+                                requiredMessage="Digite una contraseña"/>
 
-                        <h:outputText value="Confirmar"/>
-                        <p:password value="#{usuarioBean.nuevoPass2}" feedback="false" required="true" requiredMessage="Confirme la contraseña"/>
+                    <h:outputText value="Confirmar"/>
+                    <p:password value="#{usuarioBean.nuevoPass2}" feedback="false" required="true"
+                                requiredMessage="Confirme la contraseña"/>
 
-                        <h:outputText value="Tipo Persona"/>
-                        <p:selectOneMenu value="#{usuarioBean.nuevo.tipoPersona}">
-                            <f:selectItems value="#{usuarioBean.tiposPersona}"/>
-                        </p:selectOneMenu>
+                    <h:outputText value="Límite Egresos"/>
+                    <p:inputNumber value="#{usuarioBean.nuevo.limiteEgresos}" decimalPlaces="2"/>
 
-                        <h:outputText value="Límite Egresos"/>
-                        <p:inputNumber value="#{usuarioBean.nuevo.limiteEgresos}" decimalPlaces="2"/>
+                    <h:outputText value="Día Corte"/>
+                    <p:inputNumber value="#{usuarioBean.nuevo.fechaCorteDia}" decimalPlaces="0"
+                                   minValue="1" maxValue="31"/>
 
-                        <h:outputText value="Día Corte"/>
-                        <p:inputNumber value="#{usuarioBean.nuevo.fechaCorteDia}" decimalPlaces="0" minValue="1" maxValue="31"/>
+                    <h:outputText value="Estado"/>
+                    <p:selectBooleanCheckbox value="#{usuarioBean.nuevo.estado}"/>
 
-                        <h:outputText value="Estado"/>
-                        <p:selectBooleanCheckbox value="#{usuarioBean.nuevo.estado}"/>
                 </p:panelGrid>
 
                 <p:separator/>
 
-                <p:commandButton value="Guardar"
-                                 icon="pi pi-check"
+                <p:commandButton value="Guardar" icon="pi pi-check"
                                  actionListener="#{usuarioBean.guardarNuevo}"
                                  process="@form"
                                  update="@form :form:tabla :layoutForm:msgs"
@@ -128,50 +120,58 @@
 
         </p:dialog>
 
-        <p:dialog id="dlgEdit" widgetVar="dlgEditWV" header="Editar Usuario" modal="true" width="540">
-            <h:form id="editForm"> <!-- CAMBIO: agregué id al form -->
-                <p:panelGrid columns="2" styleClass="ui-fluid">
+        <!-- ===================== EDITAR ===================== -->
+        <p:dialog id="dlgEdit" widgetVar="dlgEditWV" header="Editar Usuario" modal="true" width="640" height="640">
+            <h:form id="editForm">
+
+                <p:messages id="msgEdit" showDetail="true" closable="true"/>
+
+                <p:panelGrid id="panelEdit" layout="grid" columns="2"
+                             styleClass="ui-fluid"
+                             columnClasses="col-12 md:col-4, col-12 md:col-8">
+
                     <h:outputText value="ID"/>
-                    <h:outputText value="#{usuarioBean.seleccionado.id}"/>
+                    <p:inputText value="#{usuarioBean.seleccionado.id}" readonly="true" disabled="true"/>
 
                     <h:outputText value="Nombre"/>
                     <p:inputText value="#{usuarioBean.seleccionado.nombre}" required="true"/>
 
+                    <h:outputText value="Tipo Persona"/>
+                    <p:selectOneMenu value="#{usuarioBean.seleccionado.tipoPersona}">
+                        <f:selectItems value="#{usuarioBean.tiposPersona}"/>
+                        <p:ajax update="panelEdit"/>
+                    </p:selectOneMenu>
+
                     <h:outputText value="Cédula"/>
-                    <p:inputText id="cedulaEdit"
-                                 value="#{usuarioBean.seleccionado.cedula}"
-                                 required="true"
-                                 requiredMessage="Digite la cédula."
-                                 validator="cedulaValidator"/> 
+                    <p:inputText value="#{usuarioBean.seleccionado.cedula}"
+                                 required="#{usuarioBean.seleccionado.tipoPersona eq 'FISICA'}"
+                                 disabled="#{usuarioBean.seleccionado.tipoPersona ne 'FISICA'}"/>
 
-                                 <h:outputText value=""/>
-                        <p:message for="cedulaEdit" display="text"/>
+                    <h:outputText value="RNC"/>
+                    <p:inputText value="#{usuarioBean.seleccionado.rnc}"
+                                 required="#{usuarioBean.seleccionado.tipoPersona eq 'JURIDICA'}"
+                                 disabled="#{usuarioBean.seleccionado.tipoPersona ne 'JURIDICA'}"/>
 
-                        <h:outputText value="Usuario/Login"/>
-                        <p:inputText value="#{usuarioBean.seleccionado.usuarioLogin}" required="true"/>
+                    <h:outputText value="Usuario/Login"/>
+                    <p:inputText value="#{usuarioBean.seleccionado.usuarioLogin}" required="true"/>
 
-                        <h:outputText value="Nueva contraseña"/>
-                        <p:password value="#{usuarioBean.editPass}" feedback="true"/>
+                    <h:outputText value="Nueva contraseña"/>
+                    <p:password value="#{usuarioBean.editPass}" feedback="true"/>
 
-                        <h:outputText value="Tipo Persona"/>
-                        <p:selectOneMenu value="#{usuarioBean.seleccionado.tipoPersona}">
-                            <f:selectItems value="#{usuarioBean.tiposPersona}"/>
-                        </p:selectOneMenu>
+                    <h:outputText value="Límite Egresos"/>
+                    <p:inputNumber value="#{usuarioBean.seleccionado.limiteEgresos}" decimalPlaces="2"/>
 
-                        <h:outputText value="Límite Egresos"/>
-                        <p:inputNumber value="#{usuarioBean.seleccionado.limiteEgresos}" decimalPlaces="2"/>
+                    <h:outputText value="Día Corte"/>
+                    <p:inputNumber value="#{usuarioBean.seleccionado.fechaCorteDia}" decimalPlaces="0" minValue="1" maxValue="31"/>
 
-                        <h:outputText value="Día Corte"/>
-                        <p:inputNumber value="#{usuarioBean.seleccionado.fechaCorteDia}" decimalPlaces="0" minValue="1" maxValue="31"/>
+                    <h:outputText value="Estado"/>
+                    <p:selectBooleanCheckbox value="#{usuarioBean.seleccionado.estado}"/>
 
-                        <h:outputText value="Estado"/>
-                        <p:selectBooleanCheckbox value="#{usuarioBean.seleccionado.estado}"/>
                 </p:panelGrid>
 
                 <p:separator/>
 
-                <p:commandButton value="Guardar cambios"
-                                 icon="pi pi-save"
+                <p:commandButton value="Guardar cambios" icon="pi pi-save"
                                  actionListener="#{usuarioBean.guardarEdicion}"
                                  process="@form"
                                  update="@form :form:tabla :layoutForm:msgs"

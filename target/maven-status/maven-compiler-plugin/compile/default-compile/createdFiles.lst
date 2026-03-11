@@ -2,6 +2,7 @@ com\finanzas\repo\TransaccionRepo.class
 com\finanzas\service\RenglonEgresoService.class
 com\finanzas\web\bean\TipoEgresoBean.class
 com\finanzas\service\IngresoService.class
+com\finanzas\web\util\RncValidatorUtil.class
 com\finanzas\web\bean\RenglonEgresoBean.class
 com\finanzas\entity\Usuario.class
 com\finanzas\web\bean\CrudBeanBase.class

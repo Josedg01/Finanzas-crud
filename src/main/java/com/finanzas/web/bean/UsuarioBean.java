@@ -3,9 +3,8 @@ package com.finanzas.web.bean;
 import com.finanzas.entity.Usuario;
 import com.finanzas.service.UsuarioService;
 import com.finanzas.web.util.CedulaUtil;
+import com.finanzas.web.util.RncValidatorUtil;
 import jakarta.annotation.PostConstruct;
-import jakarta.faces.application.FacesMessage;
-import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -32,7 +31,7 @@ public class UsuarioBean extends CrudBeanBase<Usuario> {
         init();
     }
 
-    public List<String> getTiposPersona() {return tiposPersona;}
+    public List<String> getTiposPersona() { return tiposPersona; }
 
     public String getNuevoPass1() { return nuevoPass1; }
     public void setNuevoPass1(String nuevoPass1) { this.nuevoPass1 = nuevoPass1; }
@@ -42,21 +41,59 @@ public class UsuarioBean extends CrudBeanBase<Usuario> {
     public void setEditPass(String editPass) { this.editPass = editPass; }
 
     @Override
-    protected List<Usuario> listar() {return service.listar();}
- 
+    protected List<Usuario> listar() { return service.listar(); }
+
+    
+    private boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+
+    
+    private void validarCedulaRncPorTipo(Usuario t) {
+        String tipo = t.getTipoPersona();
+
+        
+        if (t.getCedula() != null) t.setCedula(t.getCedula().trim());
+        if (t.getRnc() != null) t.setRnc(t.getRnc().trim());
+
+        if ("FISICA".equals(tipo)) {
+            if (isBlank(t.getCedula())) {
+                throw new IllegalArgumentException("Digite la cédula (obligatoria para persona física).");
+            }
+            if (!CedulaUtil.validarCedula(t.getCedula())) {
+                throw new IllegalArgumentException("La cédula ingresada no es válida.");
+            }
+            // limpiar RNC porque no aplica
+            t.setRnc(null);
+        }
+        else if ("JURIDICA".equals(tipo)) {
+            if (isBlank(t.getRnc())) {
+                throw new IllegalArgumentException("Digite el RNC (obligatorio para persona jurídica).");
+            }
+
+            
+            if (!RncValidatorUtil.validarRNC(t.getRnc())) {
+                throw new IllegalArgumentException("El RNC ingresado no es válido.");
+            }
+
+            // limpiar cédula porque no aplica
+            t.setCedula(null);
+        }
+        else {
+            throw new IllegalArgumentException("TipoPersona inválido. Use FISICA o JURIDICA.");
+        }
+    }
+
     @Override
     protected void crear(Usuario t) {
-        // Para login, usuarioLogin y password son obligatorios
+
         if (t.getUsuarioLogin() == null || t.getUsuarioLogin().isBlank()) {
             throw new IllegalArgumentException("Digite el Usuario/Login");
         }
-         if (t.getCedula() == null || t.getCedula().isBlank()) {
-            throw new IllegalArgumentException("Digite la cédula");
-        }
-        if (!CedulaUtil.validarCedula(t.getCedula())) {
-            throw new IllegalArgumentException("La cédula ingresada no es válida");
-        }
-        
+
+        // Cedula/RNC depende del tipo
+        validarCedulaRncPorTipo(t);
+
         if (nuevoPass1 == null || nuevoPass1.isBlank()) {
             throw new IllegalArgumentException("Digite una contraseña");
         }
@@ -71,14 +108,10 @@ public class UsuarioBean extends CrudBeanBase<Usuario> {
 
     @Override
     protected Usuario actualizar(Usuario t) {
-        if (t.getCedula() == null || t.getCedula().isBlank()) {
-            throw new IllegalArgumentException("Digite la cédula");
-        }
-        if (!CedulaUtil.validarCedula(t.getCedula())) {
-            throw new IllegalArgumentException("La cédula ingresada no es válida");
-        }
-        
-        
+
+        // Cedula/RNC depende del tipo
+        validarCedulaRncPorTipo(t);
+
         // Si se digitó una nueva contraseña, actualizar hash
         if (editPass != null && !editPass.isBlank()) {
             t.setPasswordHash(org.mindrot.jbcrypt.BCrypt.hashpw(editPass, org.mindrot.jbcrypt.BCrypt.gensalt(12)));
@@ -88,11 +121,7 @@ public class UsuarioBean extends CrudBeanBase<Usuario> {
     }
 
     @Override
-    protected void eliminarPorId(Long id) { service.eliminar(id);}
-    
-    private void addMsg(FacesMessage.Severity sev, String summary, String detail) {
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(sev, summary, detail));
-    }
+    protected void eliminarPorId(Long id) { service.eliminar(id); }
 
     @Override
     protected Usuario nuevoInstance() {
@@ -101,6 +130,11 @@ public class UsuarioBean extends CrudBeanBase<Usuario> {
         u.setFechaCorteDia(1);
         u.setTipoPersona("FISICA");
         u.setUsuarioLogin("");
+
+        // inicializar campos condicionales limpios
+        u.setCedula(null);
+        u.setRnc(null);
+
         return u;
     }
 

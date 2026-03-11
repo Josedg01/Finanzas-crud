@@ -2,7 +2,7 @@ package com.finanzas.web.util;
 
 public class CedulaUtil {
 
-    // AGREGADO: método reutilizable para validar la cédula con el algoritmo indicado
+
     public static boolean validarCedula(String pCedula) {
         if (pCedula == null || pCedula.trim().isEmpty()) {
             return false;
@@ -17,7 +17,7 @@ public class CedulaUtil {
             return false;
         }
 
-        // AGREGADO: valida que solo tenga números
+
         if (!vcCedula.matches("\\d{11}")) {
             return false;
         }
