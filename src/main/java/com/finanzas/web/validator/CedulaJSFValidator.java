@@ -11,7 +11,7 @@ import jakarta.faces.validator.ValidatorException;
 @FacesValidator("cedulaValidator")
 public class CedulaJSFValidator implements Validator<Object> {
 
-    // AGREGADO: validator JSF para usarlo directamente en los xhtml
+
     @Override
     public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
         if (value == null) {

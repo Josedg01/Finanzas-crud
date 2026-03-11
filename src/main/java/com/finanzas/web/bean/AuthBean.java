@@ -2,6 +2,9 @@ package com.finanzas.web.bean;
 
 import com.finanzas.entity.Usuario;
 import com.finanzas.service.UsuarioService;
+import com.finanzas.web.util.CedulaUtil;
+import com.finanzas.web.util.RncValidatorUtil;
+
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
@@ -30,17 +33,8 @@ public class AuthBean implements Serializable {
     // Sesión
     private Usuario usuarioActual;
 
-
-
-    public boolean isLogueado() {
-        return usuarioActual != null;
-    }
-
-
-    public boolean isLoggedIn() {
-        return usuarioActual != null;
-    }
-
+    public boolean isLogueado() { return usuarioActual != null; }
+    public boolean isLoggedIn() { return usuarioActual != null; }
 
     public String getNombreUsuario() {
         if (usuarioActual == null) return "Invitado";
@@ -53,15 +47,9 @@ public class AuthBean implements Serializable {
         return "Usuario";
     }
 
+    public void logout() { doLogout(); }
 
-    public void logout() {
-        doLogout();
-    }
-
-
-    public Usuario getUsuarioActual() {
-        return usuarioActual;
-    }
+    public Usuario getUsuarioActual() { return usuarioActual; }
 
     public String getLogin() { return login; }
     public void setLogin(String login) { this.login = login; }
@@ -78,11 +66,19 @@ public class AuthBean implements Serializable {
     public String getPassword2() { return password2; }
     public void setPassword2(String password2) { this.password2 = password2; }
 
+    private boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+
     public void prepararRegistro() {
         nuevo = new Usuario();
         nuevo.setEstado(true);
         nuevo.setFechaCorteDia(1);
         nuevo.setTipoPersona("FISICA");
+
+        nuevo.setCedula(null);
+        nuevo.setRnc(null);
+
         password1 = null;
         password2 = null;
     }
@@ -148,16 +144,13 @@ public class AuthBean implements Serializable {
                 FacesContext.getCurrentInstance().validationFailed();
                 return;
             }
-            if (nuevo.getCedula() == null || nuevo.getCedula().isBlank()) {
-                addMsg(FacesMessage.SEVERITY_ERROR, "Validación", "Digite la cédula.");
-                FacesContext.getCurrentInstance().validationFailed();
-                return;
-            }
+
             if (nuevo.getUsuarioLogin() == null || nuevo.getUsuarioLogin().isBlank()) {
                 addMsg(FacesMessage.SEVERITY_ERROR, "Validación", "Digite el usuario/login.");
                 FacesContext.getCurrentInstance().validationFailed();
                 return;
             }
+
             if (password1 == null || password1.isBlank()) {
                 addMsg(FacesMessage.SEVERITY_ERROR, "Validación", "Digite la contraseña.");
                 FacesContext.getCurrentInstance().validationFailed();
@@ -165,6 +158,44 @@ public class AuthBean implements Serializable {
             }
             if (!password1.equals(password2)) {
                 addMsg(FacesMessage.SEVERITY_ERROR, "Validación", "Las contraseñas no coinciden.");
+                FacesContext.getCurrentInstance().validationFailed();
+                return;
+            }
+
+            // Validación condicional Cedula/RNC según TipoPersona
+            String tipo = nuevo.getTipoPersona();
+            if ("FISICA".equals(tipo)) {
+                if (isBlank(nuevo.getCedula())) {
+                    addMsg(FacesMessage.SEVERITY_ERROR, "Validación", "La cédula es obligatoria para persona física.");
+                    FacesContext.getCurrentInstance().validationFailed();
+                    return;
+                }
+                nuevo.setCedula(nuevo.getCedula().trim());
+                if (!CedulaUtil.validarCedula(nuevo.getCedula())) {
+                    addMsg(FacesMessage.SEVERITY_ERROR, "Validación", "La cédula ingresada no es válida.");
+                    FacesContext.getCurrentInstance().validationFailed();
+                    return;
+                }
+                // limpiar RNC
+                nuevo.setRnc(null);
+
+            } else if ("JURIDICA".equals(tipo)) {
+                if (isBlank(nuevo.getRnc())) {
+                    addMsg(FacesMessage.SEVERITY_ERROR, "Validación", "El RNC es obligatorio para persona jurídica.");
+                    FacesContext.getCurrentInstance().validationFailed();
+                    return;
+                }
+                nuevo.setRnc(nuevo.getRnc().trim());
+                if (!RncValidatorUtil.validarRNC(nuevo.getRnc())) {
+                    addMsg(FacesMessage.SEVERITY_ERROR, "Validación", "El RNC ingresado no es válido.");
+                    FacesContext.getCurrentInstance().validationFailed();
+                    return;
+                }
+                // limpiar Cédula
+                nuevo.setCedula(null);
+
+            } else {
+                addMsg(FacesMessage.SEVERITY_ERROR, "Validación", "Tipo de persona inválido.");
                 FacesContext.getCurrentInstance().validationFailed();
                 return;
             }

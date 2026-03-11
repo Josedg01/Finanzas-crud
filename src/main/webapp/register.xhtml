@@ -4,67 +4,176 @@
       xmlns:f="jakarta.faces.core"
       xmlns:p="http://primefaces.org/ui">
 
-<h:head>
-    <title>Registro - Finanzas CRUD</title>
-</h:head>
+    <h:head>
+        <title>Registro - Finanzas CRUD</title>
 
-<h:body style="margin:0;">
+        <style>
+    
+    .reg-grid {
+        width: 100%;
+        table-layout: fixed;
+    }
 
-<f:metadata>
-    <f:viewAction action="#{authBean.prepararRegistro}"/>
-</f:metadata>
+    /* Columna label */
+    .reg-grid .reg-label {
+        width: 180px;
+        vertical-align: middle;
+        padding-right: 12px;
+        white-space: nowrap;
+    }
 
-<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;">
-    <p:card style="width:520px; max-width:100%;">
-        <f:facet name="title">Registro de usuario</f:facet>
+    
+    .reg-grid .reg-field {
+        width: 100%;
+    }
 
-        <h:form id="regForm">
-            <p:messages id="msgs" showDetail="true" closable="true"/>
+    .reg-grid td {
+        padding: 10px 0;
+        vertical-align: middle;
+    }
 
-            <p:panelGrid columns="2" styleClass="ui-fluid">
-                <p:outputLabel for="nombre" value="Nombre"/>
-                <p:inputText id="nombre" value="#{authBean.nuevo.nombre}" required="true" requiredMessage="Digite el nombre."/>
+    
+    .reg-grid .reg-field > * {
+        width: 100%;
+    }
 
-                <p:outputLabel for="ced" value="Cédula"/>
-                <p:inputText id="ced" value="#{authBean.nuevo.cedula}" required="true" requiredMessage="Digite la cédula." validator="cedulaValidator"/>
-                
-                <p:outputLabel value=""/>
-                <p:message for="ced" display="text"/>
+    
+    .reg-grid .ui-inputfield,
+    .reg-grid .ui-password,
+    .reg-grid .ui-password-input {
+        width: 100% !important;
+        display: block !important;
+        box-sizing: border-box;
+    }
 
-                <p:outputLabel for="tipo" value="Tipo Persona"/>
-                <p:selectOneMenu id="tipo" value="#{authBean.nuevo.tipoPersona}" required="true">
-                    <f:selectItem itemLabel="FISICA" itemValue="FISICA"/>
-                    <f:selectItem itemLabel="JURIDICA" itemValue="JURIDICA"/>
-                </p:selectOneMenu>
+    
+    .reg-grid .ui-selectonemenu {
+        width: 100% !important;
+        display: block !important; 
+        box-sizing: border-box;
+    }
+    .reg-grid .ui-selectonemenu .ui-selectonemenu-label {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
 
-                <p:outputLabel for="dia" value="Día Corte"/>
-                <p:inputNumber id="dia" value="#{authBean.nuevo.fechaCorteDia}" decimalPlaces="0" minValue="1" maxValue="31"/>
+    
+    .reg-grid .ui-inputnumber {
+        width: 100% !important;
+        display: block !important;
+        box-sizing: border-box;
+    }
+    .reg-grid .ui-inputnumber .ui-inputnumber-input {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
 
-                <p:outputLabel for="login" value="Usuario/Login"/>
-                <p:inputText id="login" value="#{authBean.nuevo.usuarioLogin}" required="true" requiredMessage="Digite el usuario/login."/>
+    
+    .reg-grid .ui-selectbooleancheckbox {
+        width: auto !important;
+        display: inline-block !important;
+    }
 
-                <p:outputLabel for="p1" value="Contraseña"/>
-                <p:password id="p1" value="#{authBean.password1}" feedback="true" required="true" requiredMessage="Digite la contraseña."/>
+    
+    @media (max-width: 640px) {
+        .reg-grid .reg-label,
+        .reg-grid .reg-field {
+            display: block;
+            width: 100%;
+        }
+        .reg-grid tr {
+            display: block;
+            margin-bottom: 10px;
+        }
+        .reg-grid td {
+            display: block;
+            padding: 4px 0;
+        }
+        .reg-grid .reg-label {
+            padding-right: 0;
+            margin-bottom: 4px;
+        }
+    }
+</style>
+    </h:head>
 
-                <p:outputLabel for="p2" value="Confirmar"/>
-                <p:password id="p2" value="#{authBean.password2}" feedback="false" required="true" requiredMessage="Confirme la contraseña."/>
+    <h:body style="margin:0;">
 
-                <p:outputLabel for="estado" value="Estado"/>
-                <p:selectBooleanCheckbox id="estado" value="#{authBean.nuevo.estado}"/>
-            </p:panelGrid>
+        <f:metadata>
+            <f:viewAction action="#{authBean.prepararRegistro}"/>
+        </f:metadata>
 
-            <p:separator/>
+        <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;">
+            <p:card style="width:560px; max-width:100%;">
+                <f:facet name="title">Registro de usuario</f:facet>
 
-            <p:commandButton value="Registrar" icon="pi pi-user-plus"
-                             actionListener="#{authBean.doRegister}"
-                             process="@form" update="@form"/>
+                <h:form id="regForm">
+                    <p:messages id="msgs" showDetail="true" closable="true"/>
 
-            <div style="margin-top:12px; text-align:center;">
-                <h:link outcome="/login.xhtml" value="Volver al login"/>
-            </div>
-        </h:form>
-    </p:card>
-</div>
+                    
+                    <p:panelGrid id="panelReg"
+                                 columns="2"
+                                 styleClass="ui-fluid reg-grid"
+                                 columnClasses="reg-label,reg-field">
 
-</h:body>
+                        <p:outputLabel for="nombre" value="Nombre"/>
+                        <p:inputText id="nombre" value="#{authBean.nuevo.nombre}"
+                                     required="true" requiredMessage="Digite el nombre."/>
+
+                        <p:outputLabel for="tipo" value="Tipo Persona"/>
+                        <p:selectOneMenu id="tipo" value="#{authBean.nuevo.tipoPersona}" required="true">
+                            <f:selectItem itemLabel="FISICA" itemValue="FISICA"/>
+                            <f:selectItem itemLabel="JURIDICA" itemValue="JURIDICA"/>
+                            <p:ajax update="panelReg msgs"/>
+                        </p:selectOneMenu>
+
+                        <p:outputLabel for="ced" value="Cédula"/>
+                        <p:inputText id="ced"
+                                     value="#{authBean.nuevo.cedula}"
+                                     required="#{authBean.nuevo.tipoPersona eq 'FISICA'}"
+                                     disabled="#{authBean.nuevo.tipoPersona ne 'FISICA'}"
+                                     requiredMessage="La cédula es obligatoria para persona física."/>
+
+                        <p:outputLabel for="rnc" value="RNC"/>
+                        <p:inputText id="rnc"
+                                     value="#{authBean.nuevo.rnc}"
+                                     required="#{authBean.nuevo.tipoPersona eq 'JURIDICA'}"
+                                     disabled="#{authBean.nuevo.tipoPersona ne 'JURIDICA'}"
+                                     requiredMessage="El RNC es obligatorio para persona jurídica."/>
+
+                        <p:outputLabel for="dia" value="Día Corte"/>
+                        <p:inputNumber id="dia" value="#{authBean.nuevo.fechaCorteDia}"
+                                       decimalPlaces="0" minValue="1" maxValue="31"/>
+
+                        <p:outputLabel for="login" value="Usuario/Login"/>
+                        <p:inputText id="login" value="#{authBean.nuevo.usuarioLogin}"
+                                     required="true" requiredMessage="Digite el usuario/login."/>
+
+                        <p:outputLabel for="p1" value="Contraseña"/>
+                        <p:password id="p1" value="#{authBean.password1}"
+                                    feedback="true" required="true" requiredMessage="Digite la contraseña."/>
+
+                        <p:outputLabel for="p2" value="Confirmar"/>
+                        <p:password id="p2" value="#{authBean.password2}"
+                                    feedback="false" required="true" requiredMessage="Confirme la contraseña."/>
+
+                        <p:outputLabel for="estado" value="Estado"/>
+                        <p:selectBooleanCheckbox id="estado" value="#{authBean.nuevo.estado}"/>
+
+                    </p:panelGrid>
+
+                    <p:separator/>
+
+                    <p:commandButton value="Registrar" icon="pi pi-user-plus"
+                                     actionListener="#{authBean.doRegister}"
+                                     process="@form" update="@form"/>
+
+                    <div style="margin-top:12px; text-align:center;">
+                        <h:link outcome="/login.xhtml" value="Volver al login"/>
+                    </div>
+                </h:form>
+            </p:card>
+        </div>
+
+    </h:body>
 </html>

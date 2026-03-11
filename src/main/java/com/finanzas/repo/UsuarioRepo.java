@@ -13,12 +13,18 @@ public class UsuarioRepo extends GenericRepo<Usuario> {
 
     public Usuario findByLogin(String login) {
         if (login == null) return null;
+
+        // ✅ CAMBIO: normalizar y cortar vacío
+        login = login.trim();
+        if (login.isEmpty()) return null;
+
         List<Usuario> res = em.createQuery(
                         "SELECT u FROM Usuario u WHERE LOWER(u.usuarioLogin) = LOWER(:login)",
                         Usuario.class)
-                .setParameter("login", login.trim())
+                .setParameter("login", login)
                 .setMaxResults(1)
                 .getResultList();
+
         return res.isEmpty() ? null : res.get(0);
     }
 }

@@ -1,12 +1,12 @@
 package com.finanzas.entity;
 
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "Usuario", schema = "finanzas")
 public class Usuario {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "UsuarioId")
@@ -15,12 +15,17 @@ public class Usuario {
     @Column(name = "Nombre", nullable = false, length = 140)
     private String nombre;
 
-    @Column(name = "Cedula", nullable = false, length = 20, unique = true)
+    // ✅ CAMBIO: Cedula ahora debe permitir NULL (porque JURIDICA no la usa)
+    // También quité unique=true porque ahora se maneja con índice filtrado en SQL Server
+    @Column(name = "Cedula", nullable = true, length = 20)
     private String cedula;
+
+    // ✅ NUEVO: RNC (solo aplica a JURIDICA)
+    @Column(name = "RNC", nullable = true, length = 9)
+    private String rnc;
 
     /**
      * Credencial de acceso (usuario/login). Se guarda en BD.
-     * Nota: esto es independiente del "Nombre".
      */
     @Column(name = "UsuarioLogin", nullable = false, length = 60, unique = true)
     private String usuarioLogin;
@@ -50,6 +55,10 @@ public class Usuario {
     public String getCedula() { return cedula; }
     public void setCedula(String cedula) { this.cedula = cedula; }
 
+    // ✅ NUEVO getters/setters RNC
+    public String getRnc() { return rnc; }
+    public void setRnc(String rnc) { this.rnc = rnc; }
+
     public String getUsuarioLogin() { return usuarioLogin; }
     public void setUsuarioLogin(String usuarioLogin) { this.usuarioLogin = usuarioLogin; }
 
@@ -68,22 +77,25 @@ public class Usuario {
     public Boolean getEstado() { return estado; }
     public void setEstado(Boolean estado) { this.estado = estado; }
 
+    // ✅ CAMBIO: toString ahora soporta Cedula/RNC null (no rompe)
     @Override
     public String toString() {
-        return nombre + " (" + cedula + ")";
+        String doc = (cedula != null && !cedula.isBlank())
+                ? cedula
+                : (rnc != null && !rnc.isBlank() ? rnc : "-");
+        return nombre + " (" + doc + ")";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Usuario that = (Usuario) o;
+        return id != null && id.equals(that.id);
+    }
 
-@Override
-public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    Usuario that = (Usuario) o;
-    return id != null && id.equals(that.id);
-}
-
-@Override
-public int hashCode() {
-    return 31;
-}
+    @Override
+    public int hashCode() {
+        return 31;
+    }
 }
