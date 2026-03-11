@@ -4,7 +4,9 @@
                 xmlns:h="jakarta.faces.html"
                 xmlns:f="jakarta.faces.core"
                 xmlns:p="http://primefaces.org/ui">
+
     <ui:define name="content">
+
         <h2>Usuarios</h2>
 
         <h:form id="form">
@@ -15,10 +17,12 @@
                              rendered="false" />
 
             <p:spacer width="10"/>
+
             <p:commandButton id="btnEliminar" value="Eliminar" icon="pi pi-trash"
                              actionListener="#{usuarioBean.eliminar}"
                              update="tabla :layoutForm:msgs"
                              disabled="#{empty usuarioBean.seleccionado}"/>
+
             <p:separator/>
 
             <p:dataTable id="tabla" value="#{usuarioBean.lista}" var="u"
@@ -44,6 +48,7 @@
                                      oncomplete="PF('dlgEditWV').show()"/>
                 </p:column>
             </p:dataTable>
+
         </h:form>
 
         <!-- ===================== NUEVO ===================== -->
@@ -110,7 +115,9 @@
                                  process="@form"
                                  update="@form :form:tabla :layoutForm:msgs"
                                  oncomplete="if(!args.validationFailed) PF('dlgNuevoWV').hide();"/>
+
             </h:form>
+
         </p:dialog>
 
         <!-- ===================== EDITAR ===================== -->
@@ -169,7 +176,9 @@
                                  process="@form"
                                  update="@form :form:tabla :layoutForm:msgs"
                                  oncomplete="if(!args.validationFailed) PF('dlgEditWV').hide();"/>
+
             </h:form>
+
         </p:dialog>
 
     </ui:define>
