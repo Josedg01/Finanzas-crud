@@ -133,6 +133,7 @@
                         <p:inputNumber id="montoNuevo"
                                        value="#{transaccionBean.nuevo.monto}"
                                        decimalPlaces="2"
+                                       minValue="0"
                                        required="true" requiredMessage="Monto requerido"/>
 
                         <h:outputText value="Fecha Transacción"/>
@@ -226,7 +227,7 @@
                         </p:selectOneMenu>
 
                         <h:outputText value="Monto"/>
-                        <p:inputNumber value="#{transaccionBean.seleccionado.monto}" decimalPlaces="2"
+                        <p:inputNumber value="#{transaccionBean.seleccionado.monto}" decimalPlaces="2" minValue="0"
                                        required="true" requiredMessage="Monto requerido"/>
 
                         <h:outputText value="Fecha Transacción"/>

@@ -40,6 +40,7 @@
 
                 <p:column headerText="Tipo" width="110"><h:outputText value="#{u.tipoPersona}"/></p:column>
                 <p:column headerText="Límite Egresos" width="140"><h:outputText value="#{u.limiteEgresos}"/></p:column>
+                <p:column headerText="Balance periodo" width="140"><h:outputText value="#{u.balancePeriodo}"><f:convertNumber minFractionDigits="2" maxFractionDigits="2"/></h:outputText></p:column>
                 <p:column headerText="Corte (día)" width="110"><h:outputText value="#{u.fechaCorteDia}"/></p:column>
                 <p:column headerText="Estado" width="90"><h:outputText value="#{u.estado ? 'Activo' : 'Inactivo'}"/></p:column>
 
@@ -97,7 +98,7 @@
                                 requiredMessage="Confirme la contraseña"/>
 
                     <h:outputText value="Límite Egresos"/>
-                    <p:inputNumber value="#{usuarioBean.nuevo.limiteEgresos}" decimalPlaces="2"/>
+                    <p:inputNumber value="#{usuarioBean.nuevo.limiteEgresos}" decimalPlaces="2" minValue="0"/>
 
                     <h:outputText value="Día Corte"/>
                     <p:inputNumber value="#{usuarioBean.nuevo.fechaCorteDia}" decimalPlaces="0"
@@ -159,7 +160,7 @@
                     <p:password value="#{usuarioBean.editPass}" feedback="true"/>
 
                     <h:outputText value="Límite Egresos"/>
-                    <p:inputNumber value="#{usuarioBean.seleccionado.limiteEgresos}" decimalPlaces="2"/>
+                    <p:inputNumber value="#{usuarioBean.seleccionado.limiteEgresos}" decimalPlaces="2" minValue="0"/>
 
                     <h:outputText value="Día Corte"/>
                     <p:inputNumber value="#{usuarioBean.seleccionado.fechaCorteDia}" decimalPlaces="0" minValue="1" maxValue="31"/>

@@ -12,6 +12,9 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
+import java.util.Date;
+import java.util.List;
+
 @Stateless
 public class TransaccionService extends GenericService<Transaccion> {
 
@@ -41,5 +44,10 @@ public class TransaccionService extends GenericService<Transaccion> {
 
     public Ingreso refIngreso(Long id) {
         return em.getReference(Ingreso.class, id);
+    }
+
+    // ✅ NUEVO: reporte
+    public List<Transaccion> buscarReporte(Long usuarioId, Date desde, Date hasta) {
+        return r.buscarReporte(usuarioId, desde, hasta);
     }
 }

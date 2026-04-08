@@ -9,6 +9,7 @@ import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -172,6 +173,13 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
                 return;
             }
 
+            // ✅ NUEVO: no permitir montos negativos
+            if (nuevo.getMonto().compareTo(BigDecimal.ZERO) < 0) {
+                addMsg(FacesMessage.SEVERITY_ERROR, "Validación", "El monto no puede ser negativo.");
+                markValidationFailed();
+                return;
+            }
+
             nuevo.setUsuario(service.refUsuario(nuevoUsuarioId));
 
             if (nuevoTipoPagoId != null) {
@@ -233,6 +241,13 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
             }
             if (seleccionado.getMonto() == null) {
                 addMsg(FacesMessage.SEVERITY_ERROR, "Validación", "Digite el monto.");
+                markValidationFailed();
+                return;
+            }
+
+            // ✅ NUEVO: no permitir montos negativos
+            if (seleccionado.getMonto().compareTo(BigDecimal.ZERO) < 0) {
+                addMsg(FacesMessage.SEVERITY_ERROR, "Validación", "El monto no puede ser negativo.");
                 markValidationFailed();
                 return;
             }

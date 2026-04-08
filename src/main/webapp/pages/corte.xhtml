@@ -95,16 +95,16 @@
                                   required="true" requiredMessage="Seleccione la fecha."/>
 
                     <h:outputText value="Balance Inicial"/>
-                    <p:inputNumber value="#{corteBean.nuevo.balanceInicial}" decimalPlaces="2"/>
+                    <p:inputNumber value="#{corteBean.nuevo.balanceInicial}" decimalPlaces="2" minValue="0"/>
 
                     <h:outputText value="Total Ingresos"/>
-                    <p:inputNumber value="#{corteBean.nuevo.totalIngresos}" decimalPlaces="2"/>
+                    <p:inputNumber value="#{corteBean.nuevo.totalIngresos}" decimalPlaces="2" minValue="0"/>
 
                     <h:outputText value="Total Egresos"/>
-                    <p:inputNumber value="#{corteBean.nuevo.totalEgresos}" decimalPlaces="2"/>
+                    <p:inputNumber value="#{corteBean.nuevo.totalEgresos}" decimalPlaces="2" minValue="0"/>
 
                     <h:outputText value="Balance Corte"/>
-                    <p:inputNumber value="#{corteBean.nuevo.balanceCorte}" decimalPlaces="2"/>
+                    <p:inputNumber value="#{corteBean.nuevo.balanceCorte}" decimalPlaces="2" minValue="0"/>
 
                     <h:outputText value="Estado"/>
                     <p:selectBooleanCheckbox value="#{corteBean.nuevo.estado}"/>
@@ -152,16 +152,16 @@
                                   required="true" requiredMessage="Seleccione la fecha."/>
 
                     <h:outputText value="Balance Inicial"/>
-                    <p:inputNumber value="#{corteBean.seleccionado.balanceInicial}" decimalPlaces="2"/>
+                    <p:inputNumber value="#{corteBean.seleccionado.balanceInicial}" decimalPlaces="2" minValue="0"/>
 
                     <h:outputText value="Total Ingresos"/>
-                    <p:inputNumber value="#{corteBean.seleccionado.totalIngresos}" decimalPlaces="2"/>
+                    <p:inputNumber value="#{corteBean.seleccionado.totalIngresos}" decimalPlaces="2" minValue="0"/>
 
                     <h:outputText value="Total Egresos"/>
-                    <p:inputNumber value="#{corteBean.seleccionado.totalEgresos}" decimalPlaces="2"/>
+                    <p:inputNumber value="#{corteBean.seleccionado.totalEgresos}" decimalPlaces="2" minValue="0"/>
 
                     <h:outputText value="Balance Corte"/>
-                    <p:inputNumber value="#{corteBean.seleccionado.balanceCorte}" decimalPlaces="2"/>
+                    <p:inputNumber value="#{corteBean.seleccionado.balanceCorte}" decimalPlaces="2" minValue="0"/>
 
                     <h:outputText value="Estado"/>
                     <p:selectBooleanCheckbox value="#{corteBean.seleccionado.estado}"/>

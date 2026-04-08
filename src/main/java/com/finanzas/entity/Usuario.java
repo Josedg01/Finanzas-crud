@@ -37,6 +37,10 @@ public class Usuario {
     @Column(name = "LimiteEgresos", precision = 14, scale = 2)
     private BigDecimal limiteEgresos;
 
+    // ✅ NUEVO: Balance del periodo (lo mantiene un trigger en BD)
+    @Column(name = "BalancePeriodo", nullable = false, precision = 14, scale = 2)
+    private BigDecimal balancePeriodo = BigDecimal.ZERO;
+
     @Column(name = "TipoPersona", nullable = false, length = 10)
     private String tipoPersona; // FISICA / JURIDICA
 
@@ -67,6 +71,10 @@ public class Usuario {
 
     public BigDecimal getLimiteEgresos() { return limiteEgresos; }
     public void setLimiteEgresos(BigDecimal limiteEgresos) { this.limiteEgresos = limiteEgresos; }
+
+    // ✅ NUEVO
+    public BigDecimal getBalancePeriodo() { return balancePeriodo; }
+    public void setBalancePeriodo(BigDecimal balancePeriodo) { this.balancePeriodo = balancePeriodo; }
 
     public String getTipoPersona() { return tipoPersona; }
     public void setTipoPersona(String tipoPersona) { this.tipoPersona = tipoPersona; }
