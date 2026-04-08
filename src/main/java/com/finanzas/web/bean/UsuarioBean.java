@@ -9,6 +9,7 @@ import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -94,6 +95,11 @@ public class UsuarioBean extends CrudBeanBase<Usuario> {
         // Cedula/RNC depende del tipo
         validarCedulaRncPorTipo(t);
 
+        // ✅ NUEVO: no permitir limite egresos negativo
+        if (t.getLimiteEgresos() != null && t.getLimiteEgresos().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("El límite de egresos no puede ser negativo.");
+        }
+
         if (nuevoPass1 == null || nuevoPass1.isBlank()) {
             throw new IllegalArgumentException("Digite una contraseña");
         }
@@ -111,6 +117,11 @@ public class UsuarioBean extends CrudBeanBase<Usuario> {
 
         // Cedula/RNC depende del tipo
         validarCedulaRncPorTipo(t);
+
+        // ✅ NUEVO: no permitir limite egresos negativo
+        if (t.getLimiteEgresos() != null && t.getLimiteEgresos().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("El límite de egresos no puede ser negativo.");
+        }
 
         // Si se digitó una nueva contraseña, actualizar hash
         if (editPass != null && !editPass.isBlank()) {

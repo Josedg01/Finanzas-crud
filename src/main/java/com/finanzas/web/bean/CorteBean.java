@@ -52,6 +52,11 @@ public class CorteBean extends CrudBeanBase<Corte> {
         FacesContext.getCurrentInstance().validationFailed();
     }
 
+    // ✅ NUEVO: no permitir montos negativos
+    private boolean isNeg(BigDecimal v) {
+        return v != null && v.compareTo(BigDecimal.ZERO) < 0;
+    }
+
     // ===================== CRUD Base =====================
     @Override protected List<Corte> listar() { return service.listar(); }
     @Override protected void crear(Corte t) { service.crear(t); }
@@ -104,6 +109,15 @@ public class CorteBean extends CrudBeanBase<Corte> {
 
             nuevo.setUsuario(service.refUsuario(nuevoUsuarioId));
 
+            // ✅ NUEVO: validar montos no negativos
+            if (isNeg(nuevo.getBalanceInicial()) || isNeg(nuevo.getTotalIngresos())
+                    || isNeg(nuevo.getTotalEgresos()) || isNeg(nuevo.getBalanceCorte())) {
+                addMsg(FacesMessage.SEVERITY_ERROR, "Validación",
+                        "No se permiten montos negativos en los campos del corte.");
+                markValidationFailed();
+                return;
+            }
+
             crear(nuevo);
             refrescar();
             addMsg(FacesMessage.SEVERITY_INFO, "OK", "Corte guardado.");
@@ -125,6 +139,15 @@ public class CorteBean extends CrudBeanBase<Corte> {
             }
 
             seleccionado.setUsuario(service.refUsuario(editUsuarioId));
+
+            // ✅ NUEVO: validar montos no negativos
+            if (isNeg(seleccionado.getBalanceInicial()) || isNeg(seleccionado.getTotalIngresos())
+                    || isNeg(seleccionado.getTotalEgresos()) || isNeg(seleccionado.getBalanceCorte())) {
+                addMsg(FacesMessage.SEVERITY_ERROR, "Validación",
+                        "No se permiten montos negativos en los campos del corte.");
+                markValidationFailed();
+                return;
+            }
 
             actualizar(seleccionado);
             refrescar();

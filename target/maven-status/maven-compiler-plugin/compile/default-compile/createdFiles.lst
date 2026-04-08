@@ -6,6 +6,7 @@ com\finanzas\web\util\RncValidatorUtil.class
 com\finanzas\web\bean\RenglonEgresoBean.class
 com\finanzas\entity\Usuario.class
 com\finanzas\web\bean\CrudBeanBase.class
+com\finanzas\web\bean\ReporteBean.class
 com\finanzas\web\util\SelectItemsConverter.class
 com\finanzas\repo\GenericRepo.class
 com\finanzas\service\TipoIngresoService.class
