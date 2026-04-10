@@ -12,26 +12,43 @@
         <h:form id="form">
 
             <p:panel header="Filtros" toggleable="true" collapsed="false" styleClass="ui-fluid">
-                <p:panelGrid columns="4" layout="grid" styleClass="ui-fluid"
-                             columnClasses="col-12 md:col-2, col-12 md:col-4, col-12 md:col-2, col-12 md:col-4">
 
-                    <h:outputText value="Cliente"/>
-                    <p:selectOneMenu value="#{reporteBean.usuarioId}" filter="true" filterMatchMode="contains">
+                <!-- ✅ Filtros más pegados -->
+                <p:panelGrid layout="grid" columns="12" styleClass="ui-fluid" style="padding:0; margin:0;">
+
+                    <!-- Cliente -->
+                    <h:outputText value="Cliente" styleClass="col-12 md:col-1"/>
+                    <p:selectOneMenu value="#{reporteBean.usuarioId}"
+                                     filter="true" filterMatchMode="contains"
+                                     styleClass="col-12 md:col-3"
+                                     style="width:140px">
                         <f:selectItem itemLabel="(Todos)" itemValue="#{null}" noSelectionOption="true"/>
                         <f:selectItems value="#{reporteBean.usuarios}" var="u"
                                        itemLabel="#{u.nombre}" itemValue="#{u.id}"/>
                     </p:selectOneMenu>
 
-                    <h:outputText value="Desde"/>
-                    <p:datePicker value="#{reporteBean.desde}" pattern="yyyy-MM-dd" showIcon="true"/>
+                    <!-- Desde -->
+                    <h:outputText value="Desde" styleClass="col-12 md:col-1"/>
+                    <p:datePicker id="desde" value="#{reporteBean.desde}" pattern="yyyy-MM-dd" showIcon="true"
+                                  styleClass="col-12 md:col-2"
+                                  style="width:140px">
+                        <p:ajax event="dateSelect" update="hasta"/>
+                    </p:datePicker>
 
-                    <h:outputText value="Hasta"/>
-                    <p:datePicker value="#{reporteBean.hasta}" pattern="yyyy-MM-dd" showIcon="true"/>
+                    <!-- Hasta -->
+                    <h:outputText value="Hasta" styleClass="col-12 md:col-1"/>
+                    <p:datePicker id="hasta" value="#{reporteBean.hasta}" pattern="yyyy-MM-dd" showIcon="true"
+                                  styleClass="col-12 md:col-2"
+                                  style="width:140px"
+                                  mindate="#{reporteBean.desde}"/>
 
-                    <h:outputText value=""/>
+                    <!-- Buscar -->
                     <p:commandButton value="Buscar" icon="pi pi-search"
                                      actionListener="#{reporteBean.buscar}"
-                                     update=":form:tabla :layoutForm:msgs"/>
+                                     update=":form:tabla :layoutForm:msgs"
+                                     styleClass="col-12 md:col-2"
+                                     style="width:120px"/>
+
                 </p:panelGrid>
 
                 <p:separator/>

@@ -58,6 +58,14 @@ public class ReporteBean implements Serializable {
     }
 
     public void buscar() {
+        
+        if (desde != null && hasta != null && hasta.before(desde)) {
+            addMsg(FacesMessage.SEVERITY_ERROR, "Validación",
+                    "La fecha 'Hasta' no puede ser menor que la fecha 'Desde'.");
+            FacesContext.getCurrentInstance().validationFailed();
+            return;
+        }
+
         Date d = normalizarInicioDia(desde);
         Date h = normalizarFinDia(hasta);
         lista = transaccionService.buscarReporte(usuarioId, d, h);
@@ -74,7 +82,6 @@ public class ReporteBean implements Serializable {
                     .build();
         } catch (Exception e) {
             addMsg(FacesMessage.SEVERITY_ERROR, "Error", "No se pudo generar Excel: " + e.getMessage());
-            // ✅ FIX: supplier debe ser sin argumentos
             return DefaultStreamedContent.builder()
                     .name("reporte-transacciones.xlsx")
                     .contentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
@@ -93,7 +100,6 @@ public class ReporteBean implements Serializable {
                     .build();
         } catch (Exception e) {
             addMsg(FacesMessage.SEVERITY_ERROR, "Error", "No se pudo generar PDF: " + e.getMessage());
-            // ✅ FIX: supplier debe ser sin argumentos
             return DefaultStreamedContent.builder()
                     .name("reporte-transacciones.pdf")
                     .contentType("application/pdf")
@@ -107,7 +113,6 @@ public class ReporteBean implements Serializable {
             Sheet sheet = wb.createSheet("Transacciones");
 
             CellStyle headerStyle = wb.createCellStyle();
-            // ✅ FIX: evita conflicto de tipos con com.lowagie.text.Font
             org.apache.poi.ss.usermodel.Font headerFont = wb.createFont();
             headerFont.setBold(true);
             headerStyle.setFont(headerFont);
@@ -148,7 +153,6 @@ public class ReporteBean implements Serializable {
             PdfWriter.getInstance(doc, out);
             doc.open();
 
-            // ✅ FIX: usar Font de OpenPDF explícitamente
             com.lowagie.text.Font title = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14);
             doc.add(new Paragraph("Reporte de Transacciones", title));
             doc.add(new Paragraph(" "));
