@@ -18,11 +18,16 @@ import java.util.List;
 @ViewScoped
 public class TransaccionBean extends CrudBeanBase<Transaccion> {
 
-    @Inject private TransaccionService service;
-    @Inject private UsuarioService usuarioService;
-    @Inject private TipoPagoService tipoPagoService;
-    @Inject private EgresoService egresoService;
-    @Inject private IngresoService ingresoService;
+    @Inject
+    private TransaccionService service;
+    @Inject
+    private UsuarioService usuarioService;
+    @Inject
+    private TipoPagoService tipoPagoService;
+    @Inject
+    private EgresoService egresoService;
+    @Inject
+    private IngresoService ingresoService;
 
     private List<Usuario> usuarios;
     private List<TipoPago> tiposPago;
@@ -43,11 +48,15 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
 
     @PostConstruct
     public void postConstruct() {
+        recargarCombos();
+        init();
+    }
+
+    private void recargarCombos() {
         usuarios = usuarioService.listar();
         tiposPago = tipoPagoService.listar();
         egresos = egresoService.listar();
         ingresos = ingresoService.listar();
-        init();
     }
 
     // ===================== Getters de listas =====================
@@ -91,10 +100,23 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
         FacesContext.getCurrentInstance().validationFailed();
     }
 
-    @Override protected List<Transaccion> listar() { return service.listar(); }
-    @Override protected void crear(Transaccion t) { service.crear(t); }
-    @Override protected Transaccion actualizar(Transaccion t) { return service.actualizar(t); }
-    @Override protected void eliminarPorId(Long id) { service.eliminar(id); }
+    private String getRootMessage(Throwable t) {
+        Throwable root = t;
+        while (root.getCause() != null) root = root.getCause();
+        return root.getMessage() != null ? root.getMessage() : root.toString();
+    }
+
+    @Override
+    protected List<Transaccion> listar() { return service.listar(); }
+
+    @Override
+    protected void crear(Transaccion t) { service.crear(t); }
+
+    @Override
+    protected Transaccion actualizar(Transaccion t) { return service.actualizar(t); }
+
+    @Override
+    protected void eliminarPorId(Long id) { service.eliminar(id); }
 
     @Override
     protected Transaccion nuevoInstance() {
@@ -108,8 +130,8 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
         // Defaults (solo IDs, NO objetos)
         nuevoUsuarioId = (usuarios != null && !usuarios.isEmpty()) ? usuarios.get(0).getId() : null;
         nuevoTipoPagoId = (tiposPago != null && !tiposPago.isEmpty()) ? tiposPago.get(0).getId() : null;
-        nuevoEgresoId   = (egresos != null && !egresos.isEmpty()) ? egresos.get(0).getId() : null;
-        nuevoIngresoId  = null;
+        nuevoEgresoId = (egresos != null && !egresos.isEmpty()) ? egresos.get(0).getId() : null;
+        nuevoIngresoId = null;
 
         return t;
     }
@@ -136,12 +158,10 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
         if (t == null) return;
 
         if ("INGRESO".equals(t.getTipoTransaccion())) {
-            // limpiar egreso
             if (t == nuevo) nuevoEgresoId = null;
             else editEgresoId = null;
 
         } else if ("EGRESO".equals(t.getTipoTransaccion())) {
-            // limpiar ingreso
             if (t == nuevo) nuevoIngresoId = null;
             else editIngresoId = null;
         }
@@ -173,7 +193,7 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
                 return;
             }
 
-            // ✅ NUEVO: no permitir montos negativos
+            // no permitir montos negativos
             if (nuevo.getMonto().compareTo(BigDecimal.ZERO) < 0) {
                 addMsg(FacesMessage.SEVERITY_ERROR, "Validación", "El monto no puede ser negativo.");
                 markValidationFailed();
@@ -182,12 +202,8 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
 
             nuevo.setUsuario(service.refUsuario(nuevoUsuarioId));
 
-            if (nuevoTipoPagoId != null) {
-                nuevo.setTipoPago(service.refTipoPago(nuevoTipoPagoId));
-            } else {
-                nuevo.setTipoPago(null);
-            }
-
+            if (nuevoTipoPagoId != null) nuevo.setTipoPago(service.refTipoPago(nuevoTipoPagoId));
+            else nuevo.setTipoPago(null);
 
             if ("EGRESO".equals(nuevo.getTipoTransaccion())) {
                 nuevo.setIngreso(null);
@@ -197,6 +213,7 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
                     return;
                 }
                 nuevo.setEgreso(service.refEgreso(nuevoEgresoId));
+
             } else if ("INGRESO".equals(nuevo.getTipoTransaccion())) {
                 nuevo.setEgreso(null);
                 if (nuevoIngresoId == null) {
@@ -207,14 +224,14 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
                 nuevo.setIngreso(service.refIngreso(nuevoIngresoId));
             }
 
-
-            System.out.println(">>> Guardando Transacción. UsuarioId=" + nuevoUsuarioId);
-
             crear(nuevo);
             refrescar();
+
+            recargarCombos();
+
             addMsg(FacesMessage.SEVERITY_INFO, "OK", "Transacción guardada.");
         } catch (Exception ex) {
-            addMsg(FacesMessage.SEVERITY_ERROR, "Error", ex.getMessage());
+            addMsg(FacesMessage.SEVERITY_ERROR, "Error", getRootMessage(ex));
             markValidationFailed();
         }
     }
@@ -245,7 +262,7 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
                 return;
             }
 
-            // ✅ NUEVO: no permitir montos negativos
+            // no permitir montos negativos
             if (seleccionado.getMonto().compareTo(BigDecimal.ZERO) < 0) {
                 addMsg(FacesMessage.SEVERITY_ERROR, "Validación", "El monto no puede ser negativo.");
                 markValidationFailed();
@@ -254,11 +271,8 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
 
             seleccionado.setUsuario(service.refUsuario(editUsuarioId));
 
-            if (editTipoPagoId != null) {
-                seleccionado.setTipoPago(service.refTipoPago(editTipoPagoId));
-            } else {
-                seleccionado.setTipoPago(null);
-            }
+            if (editTipoPagoId != null) seleccionado.setTipoPago(service.refTipoPago(editTipoPagoId));
+            else seleccionado.setTipoPago(null);
 
             if ("EGRESO".equals(seleccionado.getTipoTransaccion())) {
                 seleccionado.setIngreso(null);
@@ -268,6 +282,7 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
                     return;
                 }
                 seleccionado.setEgreso(service.refEgreso(editEgresoId));
+
             } else if ("INGRESO".equals(seleccionado.getTipoTransaccion())) {
                 seleccionado.setEgreso(null);
                 if (editIngresoId == null) {
@@ -280,13 +295,18 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
 
             actualizar(seleccionado);
             refrescar();
+
+            recargarCombos();
+
             addMsg(FacesMessage.SEVERITY_INFO, "OK", "Transacción actualizada.");
         } catch (Exception ex) {
-            addMsg(FacesMessage.SEVERITY_ERROR, "Error", ex.getMessage());
+            addMsg(FacesMessage.SEVERITY_ERROR, "Error", getRootMessage(ex));
             markValidationFailed();
         }
     }
 
     @Override
-    protected Long getId(Transaccion t) { return t.getId(); }
+    protected Long getId(Transaccion t) {
+        return t.getId();
+    }
 }

@@ -7,6 +7,7 @@
   <persistence-unit name="FinanzasPU" transaction-type="JTA">
     <!-- Create this resource in GlassFish: jdbc/FinanzasDS -->
     <jta-data-source>jdbc/FinanzasDS</jta-data-source>
+    <shared-cache-mode>NONE</shared-cache-mode>
 
     <properties>
       <!-- Tables already exist -->
