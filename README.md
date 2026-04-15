@@ -3,7 +3,7 @@
 ## Requisitos
 - JDK 17+
 - Maven 3.8+
-- GlassFish 7
+- GlassFish 7.0.25
 - SQL Server
 
 ## Configuración de DataSource en GlassFish
