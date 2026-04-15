@@ -1,6 +1,3 @@
-
-
-
 <ui:composition template="/templates/main.xhtml"
                 xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="jakarta.faces.facelets"
@@ -156,10 +153,11 @@
 
                 <p:separator/>
 
+                <!-- ✅ CAMBIO: actualizar msgNuevo para que se vea la alerta -->
                 <p:commandButton value="Guardar" icon="pi pi-check"
                                  actionListener="#{transaccionBean.guardarNuevo}"
                                  process="@form"
-                                 update="@form :form:tabla :layoutForm:msgs"
+                                 update="msgNuevo @form :form:tabla :layoutForm:msgs"
                                  oncomplete="if(!args.validationFailed) PF('dlgNuevoWV').hide();"/>
             </h:form>
         </p:dialog>
@@ -248,10 +246,11 @@
 
                 <p:separator/>
 
+                <!-- ✅ CAMBIO: actualizar msgEdit para ver alerta -->
                 <p:commandButton value="Guardar cambios" icon="pi pi-save"
                                  actionListener="#{transaccionBean.guardarEdicion}"
                                  process="@form"
-                                 update="@form :form:tabla :layoutForm:msgs"
+                                 update="msgEdit @form :form:tabla :layoutForm:msgs"
                                  oncomplete="if(!args.validationFailed) PF('dlgEditWV').hide();"/>
             </h:form>
         </p:dialog>

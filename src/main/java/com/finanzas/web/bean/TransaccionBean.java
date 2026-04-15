@@ -231,7 +231,16 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
 
             addMsg(FacesMessage.SEVERITY_INFO, "OK", "Transacción guardada.");
         } catch (Exception ex) {
-            addMsg(FacesMessage.SEVERITY_ERROR, "Error", getRootMessage(ex));
+            // ✅ CAMBIO: mostrar alerta especial y bloquear guardado
+            String msg = getRootMessage(ex);
+
+            if (ex instanceof IllegalArgumentException || (msg != null && msg.toLowerCase().contains("límite"))) {
+                addMsg(FacesMessage.SEVERITY_WARN, "Límite de egresos", msg);
+            } else {
+                addMsg(FacesMessage.SEVERITY_ERROR, "Error", msg);
+            }
+
+            // ✅ Bloquea el cierre del dialog y el guardado
             markValidationFailed();
         }
     }
@@ -300,7 +309,15 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
 
             addMsg(FacesMessage.SEVERITY_INFO, "OK", "Transacción actualizada.");
         } catch (Exception ex) {
-            addMsg(FacesMessage.SEVERITY_ERROR, "Error", getRootMessage(ex));
+            // ✅ CAMBIO: mostrar alerta especial y bloquear guardado
+            String msg = getRootMessage(ex);
+
+            if (ex instanceof IllegalArgumentException || (msg != null && msg.toLowerCase().contains("límite"))) {
+                addMsg(FacesMessage.SEVERITY_WARN, "Límite de egresos", msg);
+            } else {
+                addMsg(FacesMessage.SEVERITY_ERROR, "Error", msg);
+            }
+
             markValidationFailed();
         }
     }
