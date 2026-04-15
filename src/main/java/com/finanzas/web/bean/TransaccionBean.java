@@ -231,7 +231,7 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
 
             addMsg(FacesMessage.SEVERITY_INFO, "OK", "Transacción guardada.");
         } catch (Exception ex) {
-            // ✅ CAMBIO: mostrar alerta especial y bloquear guardado
+            // mostrar alerta especial y bloquear guardado
             String msg = getRootMessage(ex);
 
             if (ex instanceof IllegalArgumentException || (msg != null && msg.toLowerCase().contains("límite"))) {
@@ -240,7 +240,7 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
                 addMsg(FacesMessage.SEVERITY_ERROR, "Error", msg);
             }
 
-            // ✅ Bloquea el cierre del dialog y el guardado
+            // Bloquea el cierre del dialog y el guardado
             markValidationFailed();
         }
     }
@@ -309,7 +309,7 @@ public class TransaccionBean extends CrudBeanBase<Transaccion> {
 
             addMsg(FacesMessage.SEVERITY_INFO, "OK", "Transacción actualizada.");
         } catch (Exception ex) {
-            // ✅ CAMBIO: mostrar alerta especial y bloquear guardado
+            // mostrar alerta especial y bloquear guardado
             String msg = getRootMessage(ex);
 
             if (ex instanceof IllegalArgumentException || (msg != null && msg.toLowerCase().contains("límite"))) {

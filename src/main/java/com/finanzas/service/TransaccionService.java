@@ -45,7 +45,7 @@ public class TransaccionService extends GenericService<Transaccion> {
     }
 
     /**
-     * ✅ NUEVO: Valida límite de egresos por usuario.
+     * Valida límite de egresos por usuario.
      * Regla: si TipoTransaccion = EGRESO y Usuario.LimiteEgresos != null:
      *   SUM(egresos del usuario) + montoActual <= limite
      * Si excede -> IllegalArgumentException (bloquea guardado)
@@ -102,7 +102,7 @@ public class TransaccionService extends GenericService<Transaccion> {
         return em.getReference(Ingreso.class, id);
     }
 
-    // ✅ reporte (igual que antes)
+    //reporte (igual que antes)
     public List<Transaccion> buscarReporte(Long usuarioId, Date desde, Date hasta) {
         return r.buscarReporte(usuarioId, desde, hasta);
     }
